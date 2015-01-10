@@ -3,7 +3,7 @@
 > 优雅的定义JavaScript函数
 
 
-## 先来一个 Demo 感受一下
+## 先来一个 Demo 感受一下 [在线查看](http://runjs.cn/code/qttngmck)
 
     var repeat = def(function(self) {
       /**
@@ -78,9 +78,13 @@
 **如果没有定义一个 rules 的话，则返回的函数就是一个普通的函数，没有这些高级功能**
 
 
-### rule 的格式 `(argType1 argName1, [argType2 argName2 = defaultValue]) -> returnType`
+### rule 的格式 
+
+`(argType1 argName1, [argType2 argName2 = defaultValue]) -> returnType`
+
 
 **在 function 中的 HereDoc 上定义还要加上 @Rule 或 @rule 的声明**
+
 
 在 argName 后面加上 `＝ xxx` 可以为这个参数配置默认值，但只有可选的参数（即被 `[]` 包围的参数才有默认值配置，不过可以在定义函数时通过最后一个参数来配置全局的默认值
 
@@ -89,6 +93,7 @@
 
 
 **参数中你可以任意添加成对的 `[]`，程序会找出所有可能出现的情况，然后和实际传入的参数进行对比，第一个匹配成功的即被解析，下面的就不会执行**
+
 
 
 **默认值只支持 `字符串`、`数字`、`布尔` 及 `Null` 四种类型的字面常量**
