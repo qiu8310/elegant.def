@@ -1,0 +1,29 @@
+{
+  "name": "elegant.def",
+  "version": "0.0.0",
+  "description": "Elegant define javascript function",
+  "main": "def.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qiu8310/elegant.def"
+  },
+  "keywords": [
+    "elegant",
+    "def.js",
+    "define",
+    "function"
+  ],
+  "author": "Zhonglei Qiu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qiu8310/elegant.def/issues"
+  },
+  "homepage": "https://github.com/qiu8310/elegant.def",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-uglify": "^1.0.2"
+  }
+}

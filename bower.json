@@ -1,0 +1,30 @@
+{
+  "name": "elegant.def",
+  "version": "0.0.0",
+  "homepage": "https://github.com/qiu8310/elegant.def",
+  "authors": [
+    "Zhonglei Qiu <zhongleiqiu@gmail.com>"
+  ],
+  "description": "Elegant define javascript function",
+  "main": "def.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "elegant",
+    "define",
+    "function",
+    "arguments"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "spec",
+    "tests"
+  ]
+}
