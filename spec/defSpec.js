@@ -8,11 +8,12 @@ describe('elegant.def', function() {
   describe('通配类型测试', function() {
 
     var fn = def(
-      [
-        '(* any) -> *'
-      ],
       function(self) {
         return self.any;
+      }, {
+        rules: [
+          '(* any) -> *'
+        ]
       });
 
 
@@ -41,8 +42,10 @@ describe('elegant.def', function() {
         return self.a + self.b;
 
       }, {
-        a: 'aaa',
-        b: 2
+        defaults: {
+          a: 'aaa',
+          b: 2
+        }
       }
     );
 
@@ -56,8 +59,34 @@ describe('elegant.def', function() {
 
     it('使用用户变量和rule变量', function() {
       expect(fn(4)).toBe('in here doc4');
-    })
+    });
 
+    it('如果rule中配置的默认值和其指定的类型不一致，抛出异常', function() {
+      var fn = function() {
+        def(function(){}, {rules: ['(int a = "str") -> *']})
+      };
+      expect(fn).toThrow();
+    });
+
+
+    it('defaults 同时在多个地方定义的覆盖测试', function() {
+      var f = def(
+        function(self) {
+          /**
+           * @defaults {a: 'no_use'}
+           * @defaults {a: 'doc', b: 'doc'}
+           * @rule ([string a, string b]) -> *
+           */
+          return self.b === 'args' && self.a === 'doc';
+        },
+        {
+          defaults: {
+            b: 'args'
+          }
+        });
+
+      expect(f()).toBe(true);
+    });
 
 
   });
@@ -127,7 +156,6 @@ describe('elegant.def', function() {
 
   });
 
-
   describe('测试自定义新的参数类型', function() {
 
     // 新的类型只包含两个字符串
@@ -152,6 +180,7 @@ describe('elegant.def', function() {
     });
 
     it('可以删除自定义的类型', function() {
+      expect(def.unType).toBe(def.untype);
       def.unType('foo');
       expect(function() { fn('foo'); }).toThrow();
     })
@@ -159,7 +188,50 @@ describe('elegant.def', function() {
   });
 
 
+  describe('测试配置项', function() {
+
+    it('def.config', function() {
+      def.config('applySelf', true);
+      expect(def.config('applySelf')).toBe(true);
+      def.config('applySelf', false);
+
+      expect(def.config('not_exists_key')).toBeUndefined();
+    });
+
+    it('applySelf', function() {
+      var fn = def(function(str) {
+        /**
+         * @options {applySelf: true}
+         * @rule (string str) -> *
+         */
+        return (str === this.str && str === 'ha');
+      });
+
+      expect(fn('ha')).toBe(true);
+
+
+      def.config('applySelf', true);
+      fn = def(function(str) {
+        /**
+         * @rule (string str) -> *
+         */
+        return (str === this.str && str === 'ha');
+      });
+      expect(fn('ha')).toBe(true);
+      def.config('applySelf', false);
+
+    });
+  });
+
+
+
   describe('其它功能项测试', function() {
+
+    it('没有定义任何rule时应该报错', function(){
+      expect(function(){
+        def(function() {});
+      }).toThrow();
+    });
 
     it('参数变量名相同时应该抛出异常', function() {
       expect(function() {
@@ -173,6 +245,5 @@ describe('elegant.def', function() {
 
   });
 
-
-
 });
+

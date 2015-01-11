@@ -50,7 +50,7 @@
   // 所有用到的正则，预编译
   var RE = {
     hereDoc: /\/\*\*([\s\S]*?)\*\//,
-    gHereDocRule: /@[Rr]ule\s*(\([^\)]*\)\s*->\s*(?:\*|\w+))/g,
+    gHereDocItem: /^\s*\*\s*@(\w+)\s+(.*?)\s*$/mg,
     gTrim: /^\s*|\s*$/g,
     gComma: /,/g,
     gEOL: /[\r\n]+/g,
@@ -58,10 +58,11 @@
     gSpace: /\s+/g,
     numerical: /^(?:\d*\.)?\d+$/,
     gBracket: /([\[\]])/g,
-    ruleArgs: /\(([^\)]*)\)/,
+    rule: /\(([^\)]*)\)\s*->\s*(\*|\w+)/,   // ( ... ) -> type
     gRuleArgsItem: /(\*|\w+)\s+(\w+)\s*(?:=\s*([^,\[\]]*))?/g
   };
-  var TYPE = {};
+  var T = {},
+    C = { applySelf: false };
 
   //## 基本函数
   function typeOf(obj) { return ({}).toString.call(obj).slice(8, -1).toLowerCase(); }
@@ -77,9 +78,9 @@
 
   function arrify(arg, index) { return [].slice.call(arg, index || 0); }
   function merge(to) {
-    if (!TYPE.isObject(to)) { to = {}; }
+    if (!T.isObject(to)) { to = {}; }
     each(arrify(arguments, 1), function(arg) {
-      if (TYPE.isObject(arg)) {eachObj(arg, function(v, k) { to[k] = v; });}
+      if (T.isObject(arg)) {eachObj(arg, function(v, k) { to[k] = v; });}
     });
     return to;
   }
@@ -94,8 +95,8 @@
 
   // 类型检查
   each('Object,Number,String,Array,Boolean,Undefined,Function'.split(','), function(key) {
-    // NaN 不属于上面的任何类型，默认的 typeOf(NaN) 返回的是 true 的，用 mix === mix 把 NaN 过滤掉
-    TYPE['is' + key] = function(mix) { return mix === mix && typeOf(mix) === key.toLowerCase(); };
+    // NaN 不属于上面的任何类型，默认的 typeOf(NaN) 返回的是 number 的，用 mix === mix 把 NaN 过滤掉
+    T['is' + key] = function(mix) { return mix === mix && typeOf(mix) === key.toLowerCase(); };
   });
 
   function isNumerical(str) {
@@ -111,7 +112,7 @@
     return false;
   }
 
-  function isInt(mix) { return TYPE.isNumber(mix) && String(mix).indexOf('.') === -1; }
+  function isInt(mix) { return T.isNumber(mix) && String(mix).indexOf('.') === -1; }
 
   /**
    * 将字符串解析成 JS 的字面量，只支持 字符串、数字、布尔、null 这四种形式
@@ -124,7 +125,7 @@
    */
   var literalKeyWords = {'true': true, 'false': false, 'null': null};
   function strToLiteralValue(str) {
-    if (!TYPE.isString(str)) { return str; }
+    if (!T.isString(str)) { return str; }
     if (str === '') { return undefined; }
 
     var fc = str.charAt(0), lc = str.charAt(str.length - 1);
@@ -142,60 +143,94 @@
   }
 
 
-  function parseRulesFromHereDoc(doc) {
-    var result = [];
-
+  /**
+   * 解析函数的 HereDoc
+   * @param fn
+   */
+  function parseFnHereDoc(fn) {
+    var result = {}, doc = fn.toString();
     if (RE.hereDoc.test(doc)) {
-      RegExp.$1.replace(RE.gHereDocRule, function(_, rule) {
-        result.push(rule);
+      RegExp.$1.replace(RE.gHereDocItem, function(_, key, val) {
+        key = trim(key).toLowerCase();
+        if (!(key in result)) { result[key] = []; }
+        result[key].push(trim(val));
       });
     }
     return result;
   }
 
+  function _parseHereDocRules(rawRules) {
+    return filter(rawRules || [], function(raw) {
+      return RE.rule.test(raw);
+    });
+  }
 
-  function def(rules, fn, context) {
-    var binder = this;
-
-    if (TYPE.isFunction(rules)) {
-      context = fn;
-      fn = rules;
-      rules = [];
+  // parse string like this '{a: 123, b: true, str: hello}' to object
+  function _parseToObject(str) {
+    var len = str.length, result = {};
+    if (str.charAt(0) === '{' && str.charAt(len - 1) === '}') {
+      str = str.substr(1, len - 2);
+      each(str.split(','), function(pair) {
+        pair = pair.split(':');
+        result[trim(pair[0])] = strToLiteralValue(trim(pair[1]));
+      })
     }
+    return result;
+  }
 
-    rules = map(rules.concat(parseRulesFromHereDoc(fn.toString())), function(rule) { return new Rule(rule); });
+  // hereDoc 中有多个同名的 object 相关的配置，需要将它们 merge 到一起来
+  function _parseHereDocObjects(values) {
+    var result = {};
+    each(values || [], function(val) { merge(result, _parseToObject(val)); });
+    return result;
+  }
+
+
+  function def(fn, cfg) {
+    var binder = this, errorObj = {};
+    errorObj.function = fn.toString().replace(RE.gEOL, ' ').substr(0, 100);
+
+
+    cfg = cfg || {};
+
+    var rules = cfg.rules || [],
+      defaultValues = cfg.defaults || {},
+      options = cfg.options || {};
+
+    var hereDoc = parseFnHereDoc(fn);
+    defaultValues = merge(_parseHereDocObjects(hereDoc.defaults), defaultValues);
+    options = merge({}, C, _parseHereDocObjects(hereDoc.options), options);
+
+    rules = rules.concat(_parseHereDocRules(hereDoc.rule));
+    if (rules.length === 0) { error('No rules', errorObj);}
+
+    errorObj.rules = rules.join(';  ');
+    rules = map(rules, function(rule) { return new Rule(rule); });
+
 
     return function() {
       var args = arrify(arguments), matches = false, rule;
+      errorObj.arguments = map(args, function(arg) { return String(arg); }).join(', ');
 
-      if (rules.length === 0) {
-        return fn.apply(binder, args);
-      }
-
-      // 遍历规则，看是否有匹配的
+      // 遍历规则，看是否有匹配的，有的话立即跳出
       each(rules, function(r) {
         matches = r.match(args);
-        if (matches) {
-          rule = r;
-          return false;
-        }
+        if (matches) { rule = r; return false; }
       });
 
       // 执行原函数
       if (matches) {
         var self = {arguments: args, $rule: rule};
-        merge(self, context, matches);
-        return fn.call(binder, self);
+        merge(self, defaultValues, matches);
+        if (options.applySelf) {
+          return fn.apply(self, args);
+        } else {
+          return fn.call(binder, self);
+        }
       }
 
-
       // 输出错误（一定要输出，谁要你自己不规范，程序要写好就要确保不出现下面的错误）
-      error('Arguments match no rule.', {
-        function: fn.toString().replace(RE.gEOL, ' ').substr(0, 100),
-        arguments: map(args, function(arg) { return String(arg); }).join(','),
-        rules: map(rules, function(rule) { return rule.raw; }).join('; ')
-      });
-
+      error('Arguments match no rule.', errorObj);
     };
   }
 
@@ -226,7 +261,7 @@
     switch (type) {
       case '*':         return true;
       case 'int':       return isInt(mix);
-      case 'number':    return TYPE.isNumber(mix);
+      case 'number':    return T.isNumber(mix);
       case 'nature':    return isInt(mix) && mix >= 0;
       case 'positive':  return isInt(mix) && mix > 0;
       case 'negative':  return isInt(mix) && mix < 0;
@@ -250,7 +285,7 @@
   };
 
   // 删除自定义的类型
-  def.unType = function(key) {
+  def.untype = def.unType = function(key) {
     var fnKey = key + '___check';
     if (fnKey in typeAliases) {
       delete typeAliases[key];
@@ -258,6 +293,17 @@
       return true;
     }
     return false;
+  };
+
+  // 配置
+  def.config = function(key, val) {
+    if (T.isUndefined(val)) {
+      return C[key];
+    } else {
+      if (key in C) {
+        C[key] = val;
+      }
+    }
   };
 
 
@@ -270,13 +316,16 @@
     this.keysAry = [];  // Example: [pool, [length, [min, max]]
     this.keyOpts = {};  // key => {type: <string>, defaultValue: *, optional: <bool> }
 
-    this.rawArgs = trim(this.raw.match(RE.ruleArgs)[1]);
+    RE.rule.test(this.raw);
+    this.rawArgs = trim(RegExp.$1);
+    this.returnType = trim(RegExp.$2);
 
     // 空字符串 和 * 都全是匹配所有的情况
-    if (this.rawArgs === '' || this.rawArgs === '*') {
+    if (this.rawArgs === '') {
+      this.matchNoArgs = true;
+    } else if (this.rawArgs === '*') {
       this.matchAll = true;
     } else {
-
       // 获取 keys 和 keyOpts {key => {type: *, defaultValue: *, optional: true}
       // 返回只包含 [ ] 和 key 的字符串
       str = this._parseRuleItems();
@@ -286,12 +335,12 @@
 
       // keysAry 最外层的 key 的 optional 属性是 false
       each(this.keysAry, function(key) {
-        if (TYPE.isString(key)) {
+        if (T.isString(key)) {
           var ref = self.keyOpts[key];
           ref.optional = false;
 
           // 非 optional 的字段不能设置 defaultValue
-          if (!TYPE.isUndefined(ref.defaultValue)) {
+          if (!T.isUndefined(ref.defaultValue)) {
             self._error('Not optional key `' + key + '` can not set default value `' + ref.defaultValue + '`.')
           }
         }
@@ -311,13 +360,18 @@
       var keyOpts = this.keyOpts, keys = this.keys, self = this;
 
       return this.rawArgs.replace(RE.gRuleArgsItem, function(_, type, key, defaultValue) {
-        if (!TYPE.isUndefined(defaultValue)) {
-          defaultValue = strToLiteralValue(trim(defaultValue));
-        }
 
         if (key in keyOpts) {
           self._error('Argument name `' + key + '` duplicated');
         }
+
+        if (!T.isUndefined(defaultValue)) {
+          defaultValue = strToLiteralValue(trim(defaultValue));
+          if (!def.is(defaultValue, type)) {
+            self._error('Argument name `'+key+'` defaultValue `'+defaultValue+'` not is `'+type+'`');
+          }
+        }
+
         keys.push(key);
         keyOpts[key] = {type: type, defaultValue: defaultValue, optional: true};
 
@@ -356,13 +410,12 @@
       });
     },
 
-
     // 除了最外层的 []，在内部每遇到一个 [] 就有两种情况，要与不要
     _allPossible: function() {
       var walk = function(arr) {
         var result = [[]];  // result 是个多维数组
         each(arr, function(item) {
-          if (TYPE.isArray(item)) {
+          if (T.isArray(item)) {
             var len = result.length;
             each(walk(item), function(keys) {
               var i, copy;
@@ -385,10 +438,11 @@
       var result = {};
       if (this.matchAll) {
         return result;
+      } else if (this.matchNoArgs) {
+        return args.length === 0 ? result : false;
       } else {
         var argsLen = args.length, opt, ok,
           self = this;
-
         each(this._allPossible(), function(keys) {
           if (keys.length === argsLen) {
             ok = keys;
@@ -406,7 +460,7 @@
         if (ok) {
           // 取出默认值
           eachObj(self.keyOpts, function(opt, key) {
-            if (!TYPE.isUndefined(opt.defaultValue)) {
+            if (!T.isUndefined(opt.defaultValue)) {
               result[key] = opt.defaultValue;
             }
           });
@@ -425,58 +479,61 @@
   };
 
 
+
+
+
   if ( typeof module === 'object' && typeof module.exports === 'object' ) {
     module.exports = def;
   } else {
     (typeof window !== 'undefined' ? window : this).def = def;
   }
-
-
-
-  //var repeat = def(function(self) {
-  //  /**
-  //   * @rule ( [string pool = '1',] int min, int max ) -> string
-  //   * @rule ( [string pool = '2',] int length ) -> string
-  //   * @rule ( string pool ) -> string
-  //   *
-  //   * @return string
-  //   */
-  //
-  //  var times = function(pool, count) { return (new Array(count + 1)).join(pool); };
-  //
-  //  // 生成一个长度为 length 的 pool
-  //  if (self.length) {
-  //    return times(self.pool, self.length);
-  //  }
-  //
-  //  // 剩下的情况：生成一个长度在 min 和 max 的 pool
-  //  else {
-  //    var count = self.min + Math.floor(Math.random() * (self.max - self.min + 1));
-  //    return times(self.pool, count);
-  //  }
-  //
-  //
-  //}, {min: 1, max: 3, pool: '0'});
-  //
-  //
-  //
-  //console.log(repeat(5, 10));       // 匹配第一条 rule => 生成的 '1' 的个数在 5 到 10 之间
-  //console.log(repeat('a', 5, 10));  // 匹配第一条 rule => 生成的 'a' 的个数在 5 到 10 之间
-  //
-  //console.log(repeat(5));           // 匹配第二条 rule => 生成的5 个 '2'，即 '22222'
-  //console.log(repeat('b', 5));      // 匹配第二条 rule => 生成的5 个 'b'，即 'bbbbb'
-  //
-  //console.log(repeat('c'));         // 匹配第三条 rule => 生成的 'c' 的个数在 1 到 3 之间
-  //
-  //try{
-  //  console.log(repeat());          // 没有匹配的 rule，报错
-  //} catch (e) { console.log('catch error'); }
-  //
-  //try{
-  //  console.log(repeat('a', 'b'));  // 也没有匹配的 rule，报错
-  //} catch (e) { console.log('catch error'); }
-
-
 })();
 
 
+
+
+//
+//var repeat = module.exports(function(self) {
+//  /**
+//   * 设置默认的参数
+//   * @defaults {min: 1, max: 3, pool: '0'}
+//   *
+//   * 指定调用函数的参数的规则
+//   * @rule ( [string pool = '1',] int min, int max ) -> string
+//   * @rule ( [string pool = '2',] int length ) -> string
+//   * @rule ( string pool ) -> string
+//   *
+//   * @return string
+//   */
+//  var times = function(pool, count) { return (new Array(count + 1)).join(pool); };
+//
+//  // 生成一个长度为 length 的 pool
+//  if (self.length) {
+//    return times(self.pool, self.length);
+//  }
+//
+//  // 剩下的情况：生成一个长度在 min 和 max 的 pool
+//  else {
+//    var count = self.min + Math.floor(Math.random() * (self.max - self.min + 1));
+//    return times(self.pool, count);
+//  }
+//});
+//
+//
+//
+//console.log(repeat(5, 10));       // 匹配第一条 rule => 生成的 '1' 的个数在 5 到 10 之间
+//console.log(repeat('a', 5, 10));  // 匹配第一条 rule => 生成的 'a' 的个数在 5 到 10 之间
+//
+//console.log(repeat(5));           // 匹配第二条 rule => 生成的5 个 '2'，即 '22222'
+//console.log(repeat('b', 5));      // 匹配第二条 rule => 生成的5 个 'b'，即 'bbbbb'
+//
+//console.log(repeat('3'));         // 匹配第三条 rule => 生成的 '3' 的个数在 1 到 3 之间
+//console.log(repeat('c'));         // 匹配第三条 rule => 生成的 'c' 的个数在 1 到 3 之间
+//
+//try{
+//  console.log(repeat());          // 没有匹配的 rule，报错
+//} catch (e) { console.log('catch error'); }
+//
+//try{
+//  console.log(repeat('a', 'b'));  // 也没有匹配的 rule，报错
+//} catch (e) { console.log('catch error'); }
