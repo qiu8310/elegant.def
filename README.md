@@ -99,7 +99,7 @@
 
 > 参数风格的 defaults 和 hereDoc 风格的 defaults 会通过 merge 合并，参数风格的会覆盖 hereDoc 风格的
 
-> options 与 defaults 类型
+> options 与 defaults 类型语法类似
 
 > 综述：**参数风格中的配置的优先级比 hereDoc 风格中的配置的优先级要高**
 
