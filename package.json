@@ -1,6 +1,6 @@
 {
   "name": "elegant.def",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Elegant define javascript function",
   "main": "def.js",
   "scripts": {

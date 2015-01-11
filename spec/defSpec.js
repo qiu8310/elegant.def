@@ -224,6 +224,19 @@ describe('elegant.def', function() {
   });
 
 
+  describe('不修改原有的 this', function() {
+    it('可以正常的使用返回的函数', function() {
+      var ctx = {a: 'test'};
+      var fn = def(function() {
+        /**
+         * @rule (*) -> *
+         */
+        return this;
+      });
+      expect(fn.call(ctx)).toBe(ctx);
+    })
+  });
+
 
   describe('其它功能项测试', function() {
 

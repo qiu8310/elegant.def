@@ -187,9 +187,8 @@
 
 
   function def(fn, cfg) {
-    var binder = this, errorObj = {};
+    var errorObj = {};
     errorObj.function = fn.toString().replace(RE.gEOL, ' ').substr(0, 100);
-
 
     cfg = cfg || {};
 
@@ -209,6 +208,7 @@
 
 
     return function() {
+      var binder = this;
       var args = arrify(arguments), matches = false, rule;
       errorObj.arguments = map(args, function(arg) { return String(arg); }).join(', ');
 

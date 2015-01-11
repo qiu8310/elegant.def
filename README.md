@@ -251,6 +251,19 @@ __大小写不敏感，可以按你自己的爱好来书写__
 * rule 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rule
 * 支持配置把字符串 '123' 也当成数字，并支持全局配置和对单个函数配置(NOT DONE)(用户自己可以通过新添加类型来支持）
 * 整合我的 spa-bootstrap
+* 支持这种 rule:  (string str, int arr..., bool b) -> * ，匹配 ('abc', 1, 2, 3, 4, true)
+* silent def
+
+```    
+// hack silent def
+var _def = def;
+def = function() {
+  var binder = this;
+  try {
+    _def.apply(this, arguments);
+  } catch (e) {};
+};
+```
 
 
  
