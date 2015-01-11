@@ -94,10 +94,13 @@
 
 
 > 当然上面两种风格也可以混用，混用后:
+
 > 参数风格的 rules 和 hereDoc 风格的 rules 会并存，但 参数风格的 rules 会被先匹配
+
 > 参数风格的 defaults 和 hereDoc 风格的 defaults 会通过 merge 合并，参数风格的会覆盖 hereDoc 风格的
+
 > options 与 defaults 类型
->
+
 > 综述：**参数风格中的配置的优先级比 hereDoc 风格中的配置的优先级要高**
 
 
