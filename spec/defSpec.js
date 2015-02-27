@@ -16,7 +16,7 @@ describe('elegant.def', function() {
         ]
       });
 
-
+    
     it('即使用了通配类型，没传参数也会出错', function() {
       expect(fn).toThrow();
     });
@@ -152,6 +152,16 @@ describe('elegant.def', function() {
 
     it('类型的别名检查', function() {
       expect(fn('alias', true, 'bool')).toBe(true);
+    });
+
+    it('整数的默认值可以正常解析', function() {
+      var fn = def(function(self) {
+        /**
+         * @rule ([int a = 0, int b = 1, int c = -1]) -> int
+         */
+        return self.a === 0 && self.b === 1 && self.c === -1;
+      });
+      expect(fn()).toBe(true);
     });
 
   });

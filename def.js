@@ -100,13 +100,15 @@
   });
 
   function isNumerical(str) {
+    if (str.charAt(0) === '-') { str = str.substr(1); }
+
     if (RE.numerical.test(str)) {
       // 0056, 00.56, 56.00 也会符合正则的
       if (~str.indexOf('.')) {
         // 如果小数的第一位是0，则第二位一定要是 . ； 而如果第一位不是 0，则不管 . 在第几位都有效
         return (str.charAt(0) !== '0') || (str.charAt(1) === '.')
       } else {
-        return str.charAt(0) !== '0';
+        return str === '0' || str.charAt(0) !== '0';
       }
     }
     return false;
@@ -220,7 +222,7 @@
 
       // 执行原函数
       if (matches) {
-        var self = {arguments: args, $rule: rule};
+        var self = {arguments: args, $rule: rule, $defaults: defaultValues};
         merge(self, defaultValues, matches);
         if (options.applySelf) {
           return fn.apply(self, args);
@@ -238,14 +240,17 @@
 
   //## 基本类型
 
-  var basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(',');
-  var typeAliases = {
-    integer: 'int',
-    signed: 'int',
-    bool: 'boolean',
-    unsigned: 'nature'
-  };
+  var systemTypes = {},
+    basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(','),
+    typeAliases = {
+      integer: 'int',
+      signed: 'int',
+      bool: 'boolean',
+      unsigned: 'nature'
+    };
+
   each(basicTypes, function (key) { typeAliases[key] = key; });
+  eachObj(typeAliases, function (key) { systemTypes[key] = true; });
 
 
   def.is = function(mix, type) {
@@ -288,7 +293,9 @@
   def.untype = def.unType = function(key) {
     var fnKey = key + '___check';
     if (fnKey in typeAliases) {
-      delete typeAliases[key];
+      if (!(key in systemTypes)) {
+        delete typeAliases[key];
+      }
       delete typeAliases[fnKey];
       return true;
     }
@@ -305,7 +312,6 @@
       }
     }
   };
-
 
 
   //## 规则对象
@@ -479,17 +485,13 @@
   };
 
 
-
-
-
   if ( typeof module === 'object' && typeof module.exports === 'object' ) {
     module.exports = def;
   } else {
     (typeof window !== 'undefined' ? window : this).def = def;
   }
+
 })();
-
-
 
 
 //
