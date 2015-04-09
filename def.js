@@ -23,6 +23,8 @@
  *
  *
  *
+ *
+ *
  * 函数的参数的写法 ： NOTE 支持在 rule 中设置默认值(字符串、数字、布尔、null)，只有在方括号里的参数才能设置默认值
  *
  *  NOTE 设置默认值时，它里面不能包含 , [ ] 这三种特殊字符
@@ -44,9 +46,7 @@
  *  [[[ string foo, ] int min,] int length,] int max
  */
 
-
 (function() {
-
   // 所有用到的正则，预编译
   var RE = {
     hereDoc: /\/\*\*([\s\S]*?)\*\//,
@@ -61,6 +61,7 @@
     rule: /\(([^\)]*)\)\s*->\s*(\*|\w+)/,   // ( ... ) -> type
     gRuleArgsItem: /(\*|\w+)\s+(\w+)\s*(?:=\s*([^,\[\]]*))?/g
   };
+
   var T = {},
     C = { applySelf: false };
 
