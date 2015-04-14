@@ -1,29 +1,74 @@
-var gulp = require('gulp'),
-  fs = require('fs');
+var gulp   = require('gulp');
 
-var uglify = require('gulp-uglify'),
-  concat = require('gulp-concat'),
-  babel = require('gulp-babel'),
-  header = require('gulp-header'),
-  footer = require('gulp-footer');
+var plugins = require('gulp-load-plugins')();
 
-var sources = ['src/help.js', 'src/core.js'],
-  target = 'def.js';
+var testPath = ['test/**/test*.js'],
+  srcPath = ['src/**/*.js'],
+  otherPath = ['gulpfile.js'];
+var paths = {
+  lint: otherPath.concat(testPath, srcPath),
+  watch: otherPath.concat(testPath, srcPath),
+  tests: testPath,
+  source: srcPath
+};
 
+var plumberConf = {};
 
-var data = require('./package.json');
-data.date = (new Date()).toString();
+if (process.env.CI) {
+  plumberConf.errorHandler = function(err) {
+    throw err;
+  };
+}
 
+gulp.task('lint', function () {
+  return gulp.src(paths.lint)
+    .pipe(plugins.jshint('.jshintrc'))
+    .pipe(plugins.plumber(plumberConf))
+    .pipe(plugins.jscs())
+    .pipe(plugins.jshint.reporter('jshint-stylish'));
+});
 
-gulp.task('default', function() {
-  gulp.src(sources)
-    .pipe(concat(target))
-    .pipe(babel())
-    .pipe(header(fs.readFileSync(__dirname + '/src/intro.tpl').toString(), data))
-    .pipe(footer(fs.readFileSync(__dirname + '/src/outro.tpl').toString(), data))
-    //.pipe(uglify({preserveComments: 'some'}))
-    .pipe(gulp.dest('dist'))
+gulp.task('istanbul', function (done) {
+  gulp.src(paths.source)
+    .pipe(plugins.istanbul()) // Covering files
+    .pipe(plugins.istanbul.hookRequire()) // Force `require` to return covered files
+    .on('finish', function () {
+      gulp.src(paths.tests)
+        .pipe(plugins.plumber(plumberConf))
+        .pipe(plugins.mocha())
+        .pipe(plugins.istanbul.writeReports()) // Creating the reports after tests runned
+        .on('finish', function() {
+          process.chdir(__dirname);
+          done();
+        });
+    });
 });
 
 
-// gulp.watch(sources, ['default']);
+gulp.task('watch', ['test'], function () {
+  gulp.watch(paths.watch, function() {
+    require('child_process').spawn('gulp', ['test'], {
+      env: process.env,
+      cwd: process.cwd(),
+      stdio: [
+        process.stdin,
+        process.stdout,
+        process.stderr
+      ]
+    });
+  });
+});
+
+gulp.task('test', ['lint', 'istanbul']);
+
+gulp.task('release', [/* 'test' */], function() {
+  return gulp.src('src/full.js')
+    .pipe(plugins.rename(function(path) {
+      console.log([].slice.call(arguments));
+      path.basename = 'def.' + path.basename
+    }))
+    .pipe(plugins.webpack({ /* webpack configuration */ }))
+    .pipe(gulp.dest('./'));
+});
+
+gulp.task('default', ['watch']);

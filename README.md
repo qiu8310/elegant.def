@@ -2,6 +2,12 @@
 
 > 优雅的定义JavaScript函数
 
+## 注意事项
+
+* 如果 @rules 中参数的默认值是数组，需要要用 `<`, `>` 将数组包起来，要不会导致解析失败
+
+* TODO 支持 SourceMap
+
 
 ## 先来一个 Demo 感受一下 [在线查看](http://runjs.cn/code/v1q62mja)
 
