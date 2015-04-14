@@ -24,8 +24,7 @@ if test $# -gt 0; then
     echo '\033[31m version update failed \033[0m'
     exit 1
   fi
-  gulp release \
-    && git-changelog -t $1 \
+  git-changelog -t $1 \
     && git-release $1 \
     && echo 'npm publish ... ' \
     && npm publish

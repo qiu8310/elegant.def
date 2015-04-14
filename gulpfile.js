@@ -1,4 +1,5 @@
 var gulp   = require('gulp');
+var fs   = require('fs');
 
 var plugins = require('gulp-load-plugins')();
 
@@ -44,7 +45,6 @@ gulp.task('istanbul', function (done) {
     });
 });
 
-
 gulp.task('watch', ['test'], function () {
   gulp.watch(paths.watch, function() {
     require('child_process').spawn('gulp', ['test'], {
@@ -62,13 +62,22 @@ gulp.task('watch', ['test'], function () {
 gulp.task('test', ['lint', 'istanbul']);
 
 gulp.task('release', [/* 'test' */], function() {
-  return gulp.src('src/full.js')
-    .pipe(plugins.rename(function(path) {
-      console.log([].slice.call(arguments));
-      path.basename = 'def.' + path.basename
-    }))
-    .pipe(plugins.webpack({ /* webpack configuration */ }))
-    .pipe(gulp.dest('./'));
+  var replacer = 'module.exports = def;',
+    wrap = 'if (typeof window !== \'undefined\') { window.def = def; }';
+  var make = function(file) {
+    require('webmake')(
+      file,
+      {transform: function(filePath, content) {
+        return content.replace(replacer, replacer + '\n' + wrap);
+      }},
+      function(err, result) {
+        if (err) { throw err; }
+        fs.writeFileSync(file.replace(/^.+?\/(\w+).js$/, 'dist/$1.js'), result);
+      }
+    );
+  };
+  make('src/full.js');
+  make('src/simple.js');
 });
 
 gulp.task('default', ['watch']);
