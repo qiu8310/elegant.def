@@ -258,11 +258,15 @@ describe('defFull', function() {
   });
 
   context('test examples', function() {
-    it('#random', function() {
-      require('../examples/random')(def, assert);
-    });
-    it('#range', function() {
-      require('../examples/range')(def, assert);
+    var helper, keys;
+    keys = require('../examples/meta');
+    helper = function(key) {
+      require('../examples/' + key)(def, assert);
+      require('../examples/' + key + '.out')(def, assert);
+    };
+
+    keys.forEach(function(key) {
+      it('#' + key, function() { helper(key); });
     });
   });
 });

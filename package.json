@@ -4,6 +4,7 @@
   "description": "Elegant define javascript function",
   "main": "src/all.js",
   "scripts": {
+    "tape": "browserify test/tape/main.js | testling",
     "test": "gulp test"
   },
   "bin": {
@@ -47,17 +48,16 @@
       "ie/6..latest",
       "chrome/22..latest",
       "firefox/16..latest",
-      "safari/latest",
-      "opera/11.0..latest",
-      "iphone/6",
-      "ipad/6",
-      "android-browser/latest"
+      "safari/4..latest",
+      "opera/11..latest",
+      "iphone/6..latest",
+      "ipad/6..latest",
+      "android-browser/2.3..latest"
     ]
   },
   "dependencies": {
     "ast-traverse": "^0.1.1",
     "commander": "^2.7.1",
-    "escodegen": "^1.6.1",
     "esprima": "^2.1.0",
     "jsonfy": "^0.1.0"
   }

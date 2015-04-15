@@ -331,6 +331,7 @@
 					option.all = _opts;
 
 					module.exports = option;
+					if (typeof window !== 'undefined') { window.option = option; }
 				},
 				"rule-simple.js": function (exports, module, require) {
 					var base = require('./base'),
@@ -381,7 +382,7 @@
 					      returnType: compressedRule[0],
 					      params: base.map(compressedRule[1], function(group) {
 					        var rtn = {key: group[0], type: group[1]};
-					        if (!base.isUndefined(group[2])) { rtn.val = group[2]; }
+					        if (typeof group[2] !== 'undefined') { rtn.val = group[2]; }
 					        return rtn;
 					      }),
 					      roads: compressedRule[2]
@@ -455,6 +456,7 @@
 
 
 					module.exports = Self;
+					if (typeof window !== 'undefined') { window.Self = Self; }
 				},
 				"type.js": function (exports, module, require) {
 					/**
@@ -574,6 +576,7 @@
 					type.unType = type.untype;
 
 					module.exports = type;
+					if (typeof window !== 'undefined') { window.type = type; }
 				}
 			},
 			"simple.js": function (exports, module, require) {

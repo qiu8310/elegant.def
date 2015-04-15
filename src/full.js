@@ -1,5 +1,8 @@
 /**
- * 处理 hereDoc 版的 def，可以直接处理没有编译过的代码，如果代码编译过，请使用 simple 版的 def
+ *
+ * 全版本的 def，完全兼容另一个[简版的 def](./simple.js)
+ *
+ * 适合用在代码不需要压缩的地方，比如 node scripts、test scripts 等
  */
 
 var base = require('./lib/base'),
@@ -12,6 +15,10 @@ var base = require('./lib/base'),
 
 function def(fn) {
   var doc, cfg;
+
+  if (arguments.length > 1) {
+    return require('./simple').apply(this, arguments);
+  }
 
   if (!base.isFunction(fn)) {
     throw new TypeError('Parameter "' + fn + '" should be function.');

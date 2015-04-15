@@ -58,6 +58,12 @@ describe('base', function() {
     base.isNumerical('-a1.2').should.eql(false);
   });
 
+  it('#isUndefined', function() {
+    assert.ok(true === base.isUndefined(undefined));
+    assert.ok(true === base.isUndefined(void 0));
+    assert.ok(false === base.isUndefined(1));
+  });
+
   it('#merge', function() {
     assert.deepEqual(base.merge(false, false), {});
     assert.deepEqual(base.merge(null, {a: 1}, false), {a: 1});

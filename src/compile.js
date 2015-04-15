@@ -1,5 +1,7 @@
 /**
- * @module compiler
+ * 编译器
+ *
+ * 将 def 的 heredoc 编译成 def 的第二个参数
  *
  */
 
@@ -7,8 +9,7 @@ var base = require('./lib/base'),
   HereDoc = require('./lib/heredoc'),
   Rule = require('./lib/rule'),
   esprima = require('esprima'),
-  traverse = require('ast-traverse'),
-  escodegen = require('escodegen');
+  traverse = require('ast-traverse');
 
 
 /**
@@ -18,7 +19,7 @@ var base = require('./lib/base'),
  * @param {String} opts.defName
  * @returns {*}
  */
-module.exports = function(content, opts) {
+function compile (content, opts) {
   opts = base.merge({defName: 'def'}, opts);
 
   var ast = esprima.parse(content, {range: true, comment: true});
@@ -44,8 +45,9 @@ module.exports = function(content, opts) {
       }
     }
   });
-  delete ast.comment;
+  delete ast.comments;
 
+  var indexes = [];
   traverse(ast, {pre: function(node) {
     if (
       node.type === 'CallExpression' &&
@@ -56,12 +58,18 @@ module.exports = function(content, opts) {
       delete node.range;
       var cfg = findDocCfg(node.arguments[0].range);
       if (cfg) {
-        var argAst = esprima.parse('a = ' + JSON.stringify(cfg)).body[0].expression.right;
-        node.arguments.push(argAst);
-        return false;
+        indexes.push({index: node.arguments[0].range[1], cfg: cfg});
       }
     }
   }});
 
-  return escodegen.generate(ast, {format: {compact: true}});
-};
+  var out = [], idx = 0;
+  base.eachArr(indexes.sort(function(a, b) { return a.index - b.index; }), function(it) {
+    out.push(content.substring(idx, it.index), ', ' + JSON.stringify(it.cfg));
+    idx = it.index;
+  });
+  out.push(content.substr(idx));
+  return out.join('');
+}
+
+module.exports = compile;

@@ -46,7 +46,7 @@ module.exports = {
       returnType: compressedRule[0],
       params: base.map(compressedRule[1], function(group) {
         var rtn = {key: group[0], type: group[1]};
-        if (!base.isUndefined(group[2])) { rtn.val = group[2]; }
+        if (typeof group[2] !== 'undefined') { rtn.val = group[2]; }
         return rtn;
       }),
       roads: compressedRule[2]

@@ -61,23 +61,25 @@ gulp.task('watch', ['test'], function () {
 
 gulp.task('test', ['lint', 'istanbul']);
 
-gulp.task('release', [/* 'test' */], function() {
-  var replacer = 'module.exports = def;',
-    wrap = 'if (typeof window !== \'undefined\') { window.def = def; }';
+gulp.task('release', function() {
   var make = function(file) {
     require('webmake')(
       file,
       {transform: function(filePath, content) {
-        return content.replace(replacer, replacer + '\n' + wrap);
+        return content.replace(
+          /(module.exports\s*=\s*(\w+);)/,
+          '$1\nif (typeof window !== \'undefined\') { window.$2 = $2; }'
+        );
       }},
       function(err, result) {
         if (err) { throw err; }
-        fs.writeFileSync(file.replace(/^.+?\/(\w+).js$/, 'dist/$1.js'), result);
+        fs.writeFileSync(file.replace(/^.+?\/(\w+).js$/, 'browser/$1.js'), result);
       }
     );
   };
   make('src/full.js');
   make('src/simple.js');
+  make('src/compile.js');
 });
 
 gulp.task('default', ['watch']);

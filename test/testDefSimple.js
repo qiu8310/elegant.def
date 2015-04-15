@@ -4,8 +4,14 @@ var def = require('../src/simple'),
 describe('defSimple', function() {
   context('examples', function() {
 
-    it('#random', function() { require('../examples/random.out')(def, assert); });
-    it('#range', function() { require('../examples/range.out')(def, assert); });
+    var helper, keys;
+    keys = require('../examples/meta');
+    helper = function(key) {
+      require('../examples/' + key + '.out')(def, assert);
+    };
 
+    keys.forEach(function(key) {
+      it('#' + key, function() { helper(key); });
+    });
   });
 });
