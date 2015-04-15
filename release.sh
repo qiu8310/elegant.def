@@ -31,6 +31,9 @@ if test $# -gt 0; then
   gulp release \
     && git-changelog -t $1 \
     && git-release $1 \
+    && echo 'update gh-pages' \
+    && cp browser/* gh-pages && cd gh-pages && git add . -A && git commit -m "Release $1" \
+    && git push origin gh-pages && cd .. \
     && echo 'npm publish ... ' \
     && npm publish
 else
