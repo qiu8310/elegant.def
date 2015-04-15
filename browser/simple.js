@@ -581,7 +581,9 @@
 			},
 			"simple.js": function (exports, module, require) {
 				/**
-				 * 用在 compiler 压缩过的文件中
+				 * 简版的 def
+				 *
+				 * 不支持 heredoc，适合用在代码需要压缩的地方（代码压缩会将 heredoc 给删除了）
 				 */
 
 				var base = require('./lib/base');

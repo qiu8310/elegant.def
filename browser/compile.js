@@ -166,7 +166,9 @@
 		"src": {
 			"compile.js": function (exports, module, require) {
 				/**
-				 * @module compiler
+				 * 编译器
+				 *
+				 * 将 def 的 heredoc 编译成 def 的第二个参数
 				 *
 				 */
 

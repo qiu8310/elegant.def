@@ -113,9 +113,10 @@
 		"src": {
 			"full.js": function (exports, module, require) {
 				/**
-				 * 处理 hereDoc 版的 def，可以直接处理没有编译过的代码，如果代码编译过，请使用 simple 版的 def
 				 *
-				 * TODO 支持 simple
+				 * 全版本的 def，完全兼容另一个[简版的 def](./simple.js)
+				 *
+				 * 适合用在代码不需要压缩的地方，比如 node scripts、test scripts 等
 				 */
 
 				var base = require('./lib/base'),
@@ -128,6 +129,10 @@
 
 				function def(fn) {
 				  var doc, cfg;
+
+				  if (arguments.length > 1) {
+				    return require('./simple').apply(this, arguments);
+				  }
 
 				  if (!base.isFunction(fn)) {
 				    throw new TypeError('Parameter "' + fn + '" should be function.');
@@ -879,6 +884,40 @@
 					module.exports = type;
 					if (typeof window !== 'undefined') { window.type = type; }
 				}
+			},
+			"simple.js": function (exports, module, require) {
+				/**
+				 * 简版的 def
+				 *
+				 * 不支持 heredoc，适合用在代码需要压缩的地方（代码压缩会将 heredoc 给删除了）
+				 */
+
+				var base = require('./lib/base');
+				var option = require('./lib/option');
+				var Rule = require('./lib/rule-simple');
+				var type = require('./lib/type');
+				var Self = require('./lib/self');
+
+				/**
+				 *
+				 * @param {Function} fn
+				 * @param {Object} cfg
+				 * @returns {Function}
+				 */
+				function def(fn, cfg) {
+
+				  cfg.rules = base.map(cfg.rules, Rule.decompress);
+				  cfg.options = base.merge({}, option.all, cfg.options);
+				  cfg.defaults = base.merge({}, cfg.defaults);
+
+				  return Self.def(fn, cfg);
+				}
+
+				def.option = option;
+				base.merge(def, type);
+
+				module.exports = def;
+				if (typeof window !== 'undefined') { window.def = def; }
 			}
 		}
 	},
