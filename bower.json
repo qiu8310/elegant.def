@@ -6,7 +6,7 @@
     "Zhonglei Qiu <zhongleiqiu@gmail.com>"
   ],
   "description": "Elegant define javascript function",
-  "main": "def.js",
+  "main": "browser/full.js",
   "moduleType": [
     "amd",
     "globals",
@@ -21,10 +21,14 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "node_modules",
+    "release.sh",
+    "unrelease.sh",
+    "bin",
+    "src",
     "bower_components",
+    "node_modules",
     "test",
-    "spec",
+    "coverage",
     "tests"
   ]
 }

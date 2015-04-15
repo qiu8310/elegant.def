@@ -2,58 +2,48 @@
 
 > 优雅的定义JavaScript函数
 
-## 注意事项
 
-* 如果 @rules 中参数的默认值是数组，需要要用 `<`, `>` 将数组包起来，要不会导致解析失败
+## 先来一个 Demo 感受一下：[在线编辑](http://qiu8310.github.io/elegant.def/)，[更多 Demo](https://github.com/qiu8310/elegant.def/tree/master/examples)
 
-* TODO 支持 SourceMap
-
-
-## 先来一个 Demo 感受一下 [在线查看](http://runjs.cn/code/v1q62mja)
-
-    var repeat = def(function(self) {
+    /**
+     * 生成一个 起始值为 start，长度为 length，步进值为 step 的整数数组
+     */
+    var range = def(function() {
       /**
-       * 设置默认的参数
-       * @defaults {min: 1, max: 3, pool: '0'}
+       * 设置配置，applySelf 为 true 表示可以在内部直接使用 this
+       * @options { applySelf: true }
        * 
-       * 指定调用函数的参数的规则
-       * @rule ( [string pool = '1',] int min, int max ) -> string
-       * @rule ( [string pool = '2',] int length ) -> string
-       * @rule ( string pool ) -> string
-       *
-       * @return string
+       * 设置默认值
+       * @defaults { start: 0, length: 10, step: 1 }
+       * 
+       * 定义配置规则
+       * @rules () -> array
+       * @rules (int start) -> array
+       * @rules (int start, int length) -> array
+       * @rules (int start, int length, int step) -> array
        */
-      var times = function(pool, count) { return (new Array(count + 1)).join(pool); };
-  
-      // 生成一个长度为 length 的 pool
-      if (self.length) {
-        return times(self.pool, self.length);
+    
+      var i, result = [], count = 0;
+      for (i = this.start; count < this.length; count++, i += this.step) {
+        result.push(i);
       }
-  
-      // 剩下的情况：生成一个长度在 min 和 max 的 pool
-      else {
-        var count = self.min + Math.floor(Math.random() * (self.max - self.min + 1));
-        return times(self.pool, count);
-      }
+    
+      return result;
     });
-  
-  
-  
-    console.log(repeat(5, 10));       // 匹配第一条 rule => 生成的 '1' 的个数在 5 到 10 之间
-    console.log(repeat('a', 5, 10));  // 匹配第一条 rule => 生成的 'a' 的个数在 5 到 10 之间
-  
-    console.log(repeat(5));           // 匹配第二条 rule => 生成的5 个 '2'，即 '22222'
-    console.log(repeat('b', 5));      // 匹配第二条 rule => 生成的5 个 'b'，即 'bbbbb'
-  
-    console.log(repeat('c'));         // 匹配第三条 rule => 生成的 'c' 的个数在 1 到 3 之间
-  
-    try{
-      console.log(repeat());          // 没有匹配的 rule，报错
-    } catch (e) { console.log('catch error'); }
-  
-    try{
-      console.log(repeat('a', 'b'));  // 也没有匹配的 rule，报错
-    } catch (e) { console.log('catch error'); }
+    
+    /******* Below is test scripts ******/
+    
+    // start: 0, length: 10, step: 1
+    assert.deepEqual(range(),         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    
+    // start: 1, length: 10, step: 1
+    assert.deepEqual(range(1),        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    
+    // start: 6, length: 2, step: 1
+    assert.deepEqual(range(6, 2),     [6, 7]);
+    
+    // start: 2, length: 4, step: 2
+    assert.deepEqual(range(2, 4, 2),  [2, 4, 6, 8]);
   
   
 ## 安装
@@ -67,56 +57,58 @@
     
     bower install elegant.def --save
     
-    // 然后在页面中引入脚本即可
-  
+    // 然后在页面中引入 elegant.def/browser/full.js 脚本即可
+
 
 ## 使用
 
-### def(fn, cfg)
+### def(fn)
 
-**HereDoc 风格**
+```
+def(function(str) {
+  /**
+   *  @defaults {str: 'Hello!'}
+   *  @options {applySelf: false}
+   *  @rules ([string str]) -> *
+   */
+   console.log(self.str);
+});
+```
 
-    def(function(str) {
-      /**
-       *  @defaults {str: 'Hello!'}
-       *  @options {applySelf: false}
-       *  @rule ([string str]) -> *
-       */
-       console.log(self.str);
-    });
-    
-    
-**参数风格**
-    
-    def(function(self) {
-    
-      console.log(self.str);
-      
-    }, {
-      rules: ['([string str]) -> *']
-      defaults: {str: 'Hello!'}
-      options: {applySelf: false}
-    })
+### 代码需要压缩？
 
+代码压缩会将注释全部删除了，所以在代码压缩前需要预处理一下，可以使用以下几种方法来处理
 
-> 当然上面两种风格也可以混用，混用后:
+#### 命令行
 
-> 参数风格的 rules 和 hereDoc 风格的 rules 会并存，但 参数风格的 rules 会被先匹配
+先全局安装 `elegant.def`：`npm install -g elegant.def`
 
-> 参数风格的 defaults 和 hereDoc 风格的 defaults 会通过 merge 合并，参数风格的会覆盖 hereDoc 风格的
+再使用 `def-compile` 命令：`def-compile path/to/source/file`
 
-> options 与 defaults 类型语法类似
+#### 在线处理
 
-> 综述：**参数风格中的配置的优先级比 hereDoc 风格中的配置的优先级要高**
+[http://qiu8310.github.io/elegant.def/](http://qiu8310.github.io/elegant.def/)
 
+#### gulp-def
+
+[http://qiu8310.github.io/gulp-def/](http://qiu8310.github.io/gulp-def/)
+
+#### grunt-def
+
+[http://qiu8310.github.io/grunt-def/](http://qiu8310.github.io/grunt-def/)
+
+### 惊喜：代码预处理后，可以引用一个更小版本的脚本
+
+* Node 中引用小版本 def 脚本：`var def = require('elegant.def/src/simple')`
+* 浏览器中引用小版本 def 脚本：`elegant.def/browser/simple.js`
 
 #### 主要配置项：
 
 * defaults  函数默认的变量，确定变量值不会出现不存在的情况
-* options   一些配置项（详情查看 def.config 处的定义）
+* options   一些配置项（详情查看 [def.option](#defoptionkey-value) 处的定义）
 * rules     主要的配置（详情直接看下面专门的描述）
 
-#### rule
+#### rules
 
 > 思想其实就是使得函数的调用的每一个参数关联上一个 key，使程序员可以在函数内部通过这个 key 来使用参数
 > 另外就是还支持对这些参数的类型强制检查，并且支持设置默认值
@@ -130,7 +122,7 @@ _e.g:_
     (int length) -> int
     
     
-    // 可以配置可选的参数，下面的 rule 会匹配 fn(23) 及 fn('number', 23) 两种情况
+    // 可以配置可选的参数，下面的 rules 会匹配 fn(23) 及 fn('number', 23) 两种情况
     ([string pool='alpha'], int repeat) -> string
     
     
@@ -148,11 +140,12 @@ _e.g:_
 
 #### 注意事项
 
-* **通过HereDoc配置变量值时，只支持配置简单的 `string`, `boolean`, `number` 及 `null` 这些类型的值，另外当配置字符串时，字符串中不能含有 `,`  `[`  `]`  `:` 四种字符**
-* 如果没有定义任何 rules，会抛出异常，必须配置 rule，你可以配置一个最简单的 rule: ` ( * ) -> * `
-* rule中只有可选的参数（即包含在`[`,`]`内的参数）才能配置默认值，否则会抛出异常
+* **通过HereDoc配置变量值时，使用的解析引擎是 [jsonfy](https://github.com/qiu8310/jsonfy)**
+* 如果 @rules 中参数的默认值是数组，需要要用 `<`, `>` 将数组包起来，要不会导致 jsonfy 解析失败
+* 如果没有定义任何 rules，会抛出异常，必须配置 rules，你可以配置一个最简单的 rules: ` ( ) -> * `
 * 当前 `returnType` 目前还没有任何功能性的作用，这个后期会改进的，写上也更方便别人理解
 
+## API
 
 ### def.is(mix, type)
 
@@ -177,16 +170,18 @@ _e.g:_
 
 ### def.unType(key), def.untype(key)
 
-删除自定义的类型（系统定义的类型删除不了）
+删除已有的类型
 
 _e.g:_
 
     def.unType('float');
     
 
-### def.config(key, value)
+### def.option(key, value)
 
 配置，这是全局的配置，在定义函数时，可以指定一些具体的配置来覆盖全局配置，但这些配置只在其所在的函数内才有效
+
+如果只有一个参数 key，则返回 key 对应的值
 
 _e.g:_
 
@@ -194,7 +189,7 @@ _e.g:_
     
     def(function(str) {
       /**
-       * @rule (string str) -> *
+       * @rules (string str) -> *
        */
        return this.str === str;   // 注意使用的是 this
     });
@@ -225,65 +220,49 @@ __大小写不敏感，可以按你自己的爱好来书写__
  null                   | Null(其实这个没什么意义，这个变量的类型是 Null)
  *                      | 通配类型，可以匹配任何的类型（尽量少用，写这个程序的目的就是强化JS里的数据类型）
  
-## DEMO
-
-    var mean = def(function(self) {
-      /**
-       * @defaults {min: 0, max: 10}
-       *
-       * @rule () -> int
-       * @rule (int length) -> int
-       * @rule (int min, int max) -> int
-       */
-      var mean = self.length ? self.length : (self.min + self.max) / 2;
-      return Math.round(mean);
-    });
-    
-    console.log(mean());     // 5
-    console.log(mean(6));    // 6
-    console.log(mean(1,3));  // 2
-
-
-## 测试
-
-* 先安装 `jasmine`:  `npm install jasmine --global`
-* 再在根目录下执行运行 `jasmine` 即可
-
-
 
 ## TODO
 
+* 支持 SourceMap
 * 加上返回值的监控(5)
 * 强化 `self` 功能(5)
-* rule 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rule
+* rules 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rules
 * 支持配置把字符串 '123' 也当成数字，并支持全局配置和对单个函数配置(NOT DONE)(用户自己可以通过新添加类型来支持）
 * 整合我的 spa-bootstrap
-* 支持这种 rule:  (string str, int arr..., bool b) -> * ，匹配 ('abc', 1, 2, 3, 4, true)
+* 支持这种 rules:  (string str, int arr..., bool b) -> * ，匹配 ('abc', 1, 2, 3, 4, true)
 * 支持新类型 enum: (string<enum> flag = ok|cancel, string foo)
-* 根据 rule 自动化测试
+* 根据 rules 自动化测试
 * self 里一定要加个函数 self.has(key)，因为习惯我们经常用 if (self.key) 模式去判断
-* 缓存 _allPossible 的结果，不要每次都去运行
-* 生成注释
 * 自动测试
-* 压缩代码工具会将注释给清除了（By 鸿飞）
 * silent def
 
-```    
-// hack silent def
-var _def = def;
-def = function() {
-  var binder = this;
-  try {
-    _def.apply(this, arguments);
-  } catch (e) {};
-};
-```
+  ```    
+  // hack silent def
+  var _def = def;
+  def = function() {
+    var binder = this;
+    try {
+      _def.apply(this, arguments);
+    } catch (e) {};
+  };
+  ```
+
+## Done
+
+* v1.0.0
+
+  - 压缩代码工具会将注释给清除了（By 鸿飞）
+  - 缓存 _allPossible 的结果，不要每次都去运行
+  - 生成注释
 
 
 ## 更新日志
+
+* v1.0.0 之后更新日志移入到 [CHANGELOG.md](CHANGELOG.md)
+
 * 2015-01-13  可以用 `def.type` 来重新定义系统上已经存在的 type，但 `def.unType` 只能删除重新定义的，不会删除系统已有的（尚末测试）
 * 2015-01-12  在 self 中添加变量 `$defaults`，可以让函数体访问自己定义的默认值（尚末测试）
-* 2015-01-12  rule 中设置参数的默认 int 值为 0 或 负数 时，会将它们当作字符串（已加测试，待发布）
+* 2015-01-12  rules 中设置参数的默认 int 值为 0 或 负数 时，会将它们当作字符串（已加测试，待发布）
   
   > 主要是 isNumerical 函数少判断了为 0 和 负数 的情况
 
