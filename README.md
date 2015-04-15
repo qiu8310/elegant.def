@@ -90,6 +90,19 @@ def(function(str) {
 
 再使用 `def-compile` 命令：`def-compile path/to/source/file`
 
+#### 在 Node 脚本中处理
+
+```
+var compile = require('elegant.def/src/compile');
+var fs = require('fs');
+
+var inputContent = fs.readFileSync('path/to/source/file').toString();
+var outputContent = compile(inputContent, {defName: 'def'});
+
+// process the outputContent 
+// ...
+```
+
 #### 在线处理
 
 [http://qiu8310.github.io/elegant.def/](http://qiu8310.github.io/elegant.def/)
