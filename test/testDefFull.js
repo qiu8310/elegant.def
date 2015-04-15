@@ -265,6 +265,8 @@ describe('defFull', function() {
       require('../examples/' + key + '.out')(def, assert);
     };
 
+    //it.only('#range', function() { require('../examples/range')(def, assert); });
+
     keys.forEach(function(key) {
       it('#' + key, function() { helper(key); });
     });

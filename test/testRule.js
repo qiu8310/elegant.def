@@ -57,9 +57,6 @@ describe('Rule', function() {
     it('should compress and decompress', function() {
       var rule = Rule.parse('(int a, int b = 1) -> int');
       var compressedRule = Rule.compress(rule);
-      compressedRule.should.has.length(3);
-      compressedRule[1].should.has.length(2);
-      compressedRule[2].should.has.length(1);
 
       assert.deepEqual(Rule.decompress(compressedRule), rule);
     });

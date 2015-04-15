@@ -9,7 +9,7 @@ var jsonfy = require('jsonfy');
 var Rule = {};
 
 var reRule = /\(([^\)]*)\)\s*->\s*(\*|\w+)/;   // ( ... ) -> type
-var reArg = /(\w+|\*)\s+(\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
+var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
 //var reArg = /(\w+|\*)\s+(\w+)\s*(?:=\s*<(.*?)>\s*)?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
 var reComma = /\s*,\s*/g;
 
@@ -104,7 +104,12 @@ Rule.parse = function(rule) {
   // 得到 arg 的默认值
   args = args.replace(reArg, function(raw, t, key, val) {
     t = t.toLowerCase();
-    var param = {key: key, type: t};
+    var param, rest = 0;
+    if (key.indexOf('...') === 0) {
+      key = key.substr(3);
+      rest = 1;
+    }
+    param = {key: key, type: t, rest: rest};
     if (keyMap[key]) {
       throw new SyntaxError('Duplicate key ' + key);
     }
@@ -152,6 +157,7 @@ Rule.parse = function(rule) {
 Rule.compress = function(parsedRule) {
   var params = base.map(parsedRule.params, function(param) {
     var rtn = [param.key, param.type];
+    if (param.rest) { rtn.unshift(param.rest); }
     if ('val' in param) { rtn.push(param.val); }
     return rtn;
   });

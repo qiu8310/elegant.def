@@ -12,7 +12,7 @@ module.exports = function(def, assert) {
   }, {"rules":[["string",[["words","string"]],[[0]]]]});
 
 
-  
+
   var dog = new Dog('David');
 
   assert.equal(dog.say('Hello!'), 'David said Hello!');

@@ -9,31 +9,38 @@ module.exports = {
    * @returns {Boolean}
    */
   match: function(parsedRule, args) {
-    var result = false;
+    var result;
     var argsLen = args.length, okRoad;
+
     base.eachArr(parsedRule.roads, function(road, j) {
-      if (road.length === argsLen) {
-        okRoad = road;
-        base.eachArr(road, function(index, i) {
-          var param = parsedRule.params[index];
-          if (!type.is(args[i], param.type)) {
-            okRoad = false;
-            return okRoad;
+      result = {};
+      var roadIndex, argIndex = 0, param, arg;
+      for (roadIndex = 0; roadIndex < road.length; roadIndex++) {
+        param = parsedRule.params[road[roadIndex]];
+        arg = args[argIndex];
+        if (!type.is(arg, param.type) || argIndex >= argsLen) {
+          break;
+        }
+
+        argIndex++;
+        if (param.rest) {
+          result[param.key] = [arg];
+          while (argIndex < argsLen && type.is(args[argIndex], param.type)) {
+            result[param.key].push(args[argIndex]);
+            argIndex++;
           }
-        });
-        return !okRoad;
+        } else {
+          result[param.key] = arg;
+        }
+      }
+
+      if (argIndex === argsLen && roadIndex === road.length) {
+        okRoad = road;
+        return false;
       }
     });
 
-    if (okRoad) {
-      result = {};
-      base.eachArr(okRoad, function(i, j) {
-        var param = parsedRule.params[i];
-        result[param.key] = args[j];
-      });
-    }
-
-    return result;
+    return okRoad ? result : false;
   },
 
   /**
@@ -45,8 +52,9 @@ module.exports = {
     return {
       returnType: compressedRule[0],
       params: base.map(compressedRule[1], function(group) {
-        var rtn = {key: group[0], type: group[1]};
-        if (typeof group[2] !== 'undefined') { rtn.val = group[2]; }
+        if (group[0] !== 1) { group.unshift(0); }
+        var rtn = {key: group[1], type: group[2], rest: group[0]};
+        if (group.length > 3) { rtn.val = group[3]; }
         return rtn;
       }),
       roads: compressedRule[2]

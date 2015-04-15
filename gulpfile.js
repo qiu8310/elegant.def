@@ -59,7 +59,15 @@ gulp.task('watch', ['test'], function () {
   });
 });
 
-gulp.task('test', ['lint', 'istanbul']);
+gulp.task('example', function() {
+  var compile = require('./src/compile');
+  require('./examples/meta').forEach(function(key) {
+    fs.writeFileSync('./examples/' + key + '.out.js',
+      compile(fs.readFileSync('./examples/' + key + '.js').toString()));
+  });
+});
+
+gulp.task('test', ['example', 'lint', 'istanbul']);
 
 gulp.task('release', function() {
   var make = function(file) {
