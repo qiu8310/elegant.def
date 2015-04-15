@@ -17,16 +17,16 @@ program
 if (!program.args.length) {
   program.help();
 } else {
+  program.args.forEach(function(file) {
+    var inContent = fs.readFileSync(file).toString();
+    var outContent = compile(inContent, program);
 
-  var inFile = program.args[0];
-  var inContent = fs.readFileSync(inFile).toString();
-  var outContent = compile(inContent, program);
-
-  if (program.print) {
-    console.log(outContent);
-  } else {
-    var outFile = program.outFile || inFile.replace(/(\.\w+)?$/, '.out$1');
-    fs.writeFileSync(outFile, outContent);
-    console.log('\r\n  Write to ' + outFile + ' ok!\r\n');
-  }
+    if (program.print) {
+      console.log(outContent);
+    } else {
+      var outFile = program.outFile || file.replace(/(\.\w+)?$/, '.out$1');
+      fs.writeFileSync(outFile, outContent);
+      console.log('Write to ' + outFile + ' ok!\r\n');
+    }
+  });
 }
