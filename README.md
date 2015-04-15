@@ -248,7 +248,6 @@ __大小写不敏感，可以按你自己的爱好来书写__
 * rules 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rules
 * 支持配置把字符串 '123' 也当成数字，并支持全局配置和对单个函数配置(NOT DONE)(用户自己可以通过新添加类型来支持）
 * 整合我的 spa-bootstrap
-* 支持这种 rules:  (string str, int arr..., bool b) -> * ，匹配 ('abc', 1, 2, 3, 4, true)
 * 支持新类型 enum: (string<enum> flag = ok|cancel, string foo)
 * 根据 rules 自动化测试
 * self 里一定要加个函数 self.has(key)，因为习惯我们经常用 if (self.key) 模式去判断
