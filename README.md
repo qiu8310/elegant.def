@@ -96,24 +96,25 @@ def(function(str) {
 
 #### gulp-def
 
-[http://qiu8310.github.io/gulp-def/](http://qiu8310.github.io/gulp-def/)
+[http://github.com/qiu8310/gulp-def/](http://github.com/qiu8310/gulp-def/)
 
 #### grunt-def
 
-[http://qiu8310.github.io/grunt-def/](http://qiu8310.github.io/grunt-def/)
+[http://github.com/qiu8310/grunt-def/](http://github.com/qiu8310/grunt-def/)
 
 ### 惊喜：代码预处理后，可以引用一个更小版本的脚本
 
 * Node 中引用小版本 def 脚本：`var def = require('elegant.def/src/simple')`
 * 浏览器中引用小版本 def 脚本：`elegant.def/browser/simple.js`
 
-#### 主要配置项：
 
-* defaults  函数默认的变量，确定变量值不会出现不存在的情况
+## HereDoc 中的配置项：
+
+* defaults  配置函数默认的变量值，保证变量值不会出现不存在的情况
 * options   一些配置项（详情查看 [def.option](#defoptionkey-value) 处的定义）
 * rules     主要的配置（详情直接看下面专门的描述）
 
-#### rules
+### rules
 
 > 思想其实就是使得函数的调用的每一个参数关联上一个 key，使程序员可以在函数内部通过这个 key 来使用参数
 > 另外就是还支持对这些参数的类型强制检查，并且支持设置默认值
@@ -143,7 +144,7 @@ _e.g:_
     
     
 
-#### 注意事项
+## 注意事项
 
 * **通过HereDoc配置变量值时，使用的解析引擎是 [jsonfy](https://github.com/qiu8310/jsonfy)**
 * 如果 @rules 中参数的默认值是数组，需要要用 `<`, `>` 将数组包起来，要不会导致 jsonfy 解析失败
@@ -252,7 +253,7 @@ __大小写不敏感，可以按你自己的爱好来书写__
   };
   ```
 
-## Done
+## DONE
 
 * v1.0.0
 
