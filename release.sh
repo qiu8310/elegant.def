@@ -22,6 +22,7 @@ if test $# -gt 0; then
   version=$1
   echo Current package version $cur_version, bump to $version
   sed -i ""  "s/\"version\": *\"${cur_version}\"/\"version\": \"${version}\"/g" package.json
+  sed -i ""  "s/\"version\": *\"${cur_version}\"/\"version\": \"${version}\"/g" bower.json
   update_version=$(get_package_version)
   if [[ $update_version != $version ]] ; then
     echo '\033[31m version update failed \033[0m'

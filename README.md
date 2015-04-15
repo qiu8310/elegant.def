@@ -1,4 +1,9 @@
 # elegant.def
+[![NPM version](https://badge.fury.io/js/elegant.def.svg)](https://npmjs.org/package/elegant.def)
+[![GitHub version][git-tag-image]][project-url]
+[![Build Status][travis-image]][travis-url]
+[![Dependency Status][daviddm-url]][daviddm-image]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 > 优雅的定义JavaScript函数
 
@@ -268,3 +273,14 @@ __大小写不敏感，可以按你自己的爱好来书写__
 
 
  
+
+[doc-url]: http://inch-ci.org/github/qiu8310/elegant.def
+[doc-image]: http://inch-ci.org/github/qiu8310/elegant.def.svg?branch=master
+[project-url]: https://github.com/qiu8310/elegant.def
+[git-tag-image]: http://img.shields.io/github/tag/qiu8310/elegant.def.svg
+[travis-url]: https://travis-ci.org/qiu8310/elegant.def
+[travis-image]: https://travis-ci.org/qiu8310/elegant.def.svg?branch=master
+[daviddm-url]: https://david-dm.org/qiu8310/elegant.def.svg?theme=shields.io
+[daviddm-image]: https://david-dm.org/qiu8310/elegant.def
+[coveralls-url]: https://coveralls.io/r/qiu8310/elegant.def
+[coveralls-image]: https://coveralls.io/repos/qiu8310/elegant.def/badge.png
