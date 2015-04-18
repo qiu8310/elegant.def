@@ -289,3 +289,7 @@ __大小写不敏感，可以按你自己的爱好来书写__
 [daviddm-image]: https://david-dm.org/qiu8310/elegant.def
 [coveralls-url]: https://coveralls.io/r/qiu8310/elegant.def
 [coveralls-image]: https://coveralls.io/repos/qiu8310/elegant.def/badge.png
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/qiu8310/elegant.def/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
