@@ -24,7 +24,7 @@ describe('Rule', function() {
       Rule.parse('(string a = "123") -> *').params[0].val.should.eql('123');
       Rule.parse('(string a = "123", bool b = true) -> *').params[1].val.should.eql(true);
 
-      assert.throws(function() { Rule.parse('(int a = [a,b) -> *'); }, /parsed error/);
+      assert.throws(function() { Rule.parse('(int a = [a,b) -> *'); }, /Parse rule arguments error/);
     });
 
     it('should parse optional params', function() {

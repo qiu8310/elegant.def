@@ -6,10 +6,11 @@ var base = require('./base');
 var type = require('./type');
 var RuleSimple = require('./rule-simple');
 var jsonfy = require('jsonfy');
+var scan = require('sscan');
 var Rule = {};
 
 var reRule = /\(([^\)]*)\)\s*->\s*(\*|\w+)/;   // ( ... ) -> type
-var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
+//var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
 //var reArg = /(\w+|\*)\s+(\w+)\s*(?:=\s*<(.*?)>\s*)?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
 var reComma = /\s*,\s*/g;
 
@@ -80,6 +81,72 @@ function parseVal(val) {
   return jsonfy(val);
 }
 
+// args before :  "* start, [int ...length, int step = 1 ]"
+// args after :   "0, [1, 2]"
+function _parseRuleArgs(args) {
+  var tpl = '', params = [], count = 0;
+
+  scan(args, function(end) {
+
+    this.white();
+    if (this.eos()) { end(); }
+
+    var param = {};
+
+    tpl += this.till(/[\[\s]/, /[\w\*]/);
+
+    if (this.isChar('*')) {
+      param.type = '*';
+      this.next('*');
+    } else {
+      param.type = this.takeWord();
+    }
+
+    this.next(/\s/);
+    this.white();
+
+    if (this.isChar('.')) {
+      this.next('.');
+      this.next('.');
+      this.next('.');
+      param.rest = 1;
+    } else {
+      param.rest = 0;
+    }
+    param.key = this.takeWord();
+
+    tpl += count++;
+
+    tpl += this.till(/[\s\[\]]/, ',=', function(rest) {
+      tpl += rest;
+      params.push(param); end();
+    });
+
+    if (this.isChar('=')) {
+      this.next('=');
+      this.white();
+      if (this.isChar('"\'[{')) {
+        param.val = this.takeValue();
+      } else if (this.isChar('<')) {
+        param.val = this.takePair('<', '>'); // 为了兼容早期的正则表达式版本
+      } else {
+        param.val = base.trim(this.take(/[^\[\],]/));
+      }
+    }
+
+    params.push(param);
+
+    tpl += this.take(/[,\]\[\s]/);
+
+    if (this.eos()) {
+      end();
+    }
+  });
+
+  return {tpl: tpl, params: params};
+}
+
+
 /**
  * 解析 HereDoc 中的一条 @rules 定义的规则
  *
@@ -92,43 +159,43 @@ Rule.parse = function(rule) {
     throw new SyntaxError('Rule "' + rule + '" defined error.');
   }
 
-  var args = base.trim(RegExp.$1),
-    params = [], roads = [], index = -1, result, keyMap = {};
+  var args = base.trim(RegExp.$1), parsedArgs,
+    roads = [], result, keyMap = {};
 
   result = {
     returnType: RegExp.$2.toLowerCase(),
-    params: params,
     roads: roads
   };
 
-  // 得到 arg 的默认值
-  args = args.replace(reArg, function(raw, t, key, val) {
-    t = t.toLowerCase();
-    var param, rest = 0;
-    if (key.indexOf('...') === 0) {
-      key = key.substr(3);
-      rest = 1;
-    }
-    param = {key: key, type: t, rest: rest};
-    if (keyMap[key]) {
-      throw new SyntaxError('Duplicate key ' + key);
-    }
-    keyMap[key] = true;
-    if (val) {
-      try {
-        param.val = parseVal(val);
-      } catch (e) {
-        throw new SyntaxError('Rule "' + rule + '" value "' + val + '" parsed error.');
-      }
-      if (!type.is(param.val, t)) {
-        throw new SyntaxError(key + '\'s value is not type ' + t);
-      }
-    }
-    params.push(param);
-    index++;
+  // args before :  "int start, [int length, int step = 1 ]"
+  // args after :   "0, [1, 2]"
+  try {
+    parsedArgs = _parseRuleArgs(args);
+  } catch (e) {
+    throw new Error('Parse rule arguments error: ' + args);
+  }
 
-    return ' ' + index + ' ';
+  args = parsedArgs.tpl;
+  base.eachArr(parsedArgs.params, function(param) {
+    if (keyMap[param.key]) { throw new SyntaxError('Duplicate key ' + param.key); }
+    keyMap[param.key] = true;
+
+    if (!base.isUndefined(param.val)) {
+      param.type = param.type.toLowerCase();
+
+      try {
+        param.val = parseVal(param.val);
+      } catch (e) {
+        throw new SyntaxError('Rule "' + rule + '" value "' + param.val + '" parsed error.');
+      }
+
+      if (!type.is(param.val, param.type)) {
+        throw new SyntaxError(param.key + '\'s value is not type ' + param.type);
+      }
+    }
   });
+
+  result.params = parsedArgs.params;
 
   // 去掉所有的 ','
   args = args.replace(reComma, ' ');
@@ -148,6 +215,7 @@ Rule.parse = function(rule) {
 
   return result;
 };
+
 
 /**
  * 将 rule 压缩， compiler 中要用

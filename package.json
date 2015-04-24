@@ -60,6 +60,7 @@
     "ast-traverse": "^0.1.1",
     "commander": "^2.7.1",
     "esprima": "^2.1.0",
-    "jsonfy": "^0.1.0"
+    "jsonfy": "^0.1.0",
+    "sscan": "^0.1.0"
   }
 }

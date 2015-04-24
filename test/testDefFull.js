@@ -246,13 +246,13 @@ describe('defFull', function() {
     });
 
     it('参数变量名相同时应该抛出异常', function() {
-      assert.throws(function() {
+      (function() {
         def(function() {
           /**
            * @rules (string a, bool a) -> *
            */
         });
-      }, /Duplicate key/);
+      }).should.throw(/Duplicate key/);
     });
 
   });
