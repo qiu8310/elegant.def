@@ -552,7 +552,7 @@
 					var Rule = {};
 
 					var reRule = /\(([^\)]*)\)\s*->\s*(\*|\w+)/;   // ( ... ) -> type
-					var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
+					//var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
 					//var reArg = /(\w+|\*)\s+(\w+)\s*(?:=\s*<(.*?)>\s*)?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
 					var reComma = /\s*,\s*/g;
 
@@ -702,7 +702,7 @@
 					  }
 
 					  var args = base.trim(RegExp.$1), parsedArgs,
-					    roads = [], index = -1, result, keyMap = {};
+					    roads = [], result, keyMap = {};
 
 					  result = {
 					    returnType: RegExp.$2.toLowerCase(),
