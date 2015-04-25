@@ -145,7 +145,8 @@
 				  }
 
 				  if (!cfg || !cfg.rules || !cfg.rules.length) {
-				    throw new Error('No rules.');
+				    //throw new Error('No rules.');
+				    return fn;
 				  }
 
 				  cfg.rules = base.map(cfg.rules, Rule.parse);
@@ -987,6 +988,10 @@
 				 * @returns {Function}
 				 */
 				function def(fn, cfg) {
+
+				  if (!cfg) {
+				    return fn;
+				  }
 
 				  cfg.rules = base.map(cfg.rules, Rule.decompress);
 				  cfg.options = base.merge({}, option.all, cfg.options);
