@@ -31,7 +31,8 @@ function def(fn) {
   }
 
   if (!cfg || !cfg.rules || !cfg.rules.length) {
-    throw new Error('No rules.');
+    //throw new Error('No rules.');
+    return fn;
   }
 
   cfg.rules = base.map(cfg.rules, Rule.parse);

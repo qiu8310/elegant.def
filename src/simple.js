@@ -18,6 +18,10 @@ var Self = require('./lib/self');
  */
 function def(fn, cfg) {
 
+  if (!cfg) {
+    return fn;
+  }
+
   cfg.rules = base.map(cfg.rules, Rule.decompress);
   cfg.options = base.merge({}, option.all, cfg.options);
   cfg.defaults = base.merge({}, cfg.defaults);

@@ -241,8 +241,9 @@ describe('defFull', function() {
       assert.throws(function() {def('aa');}, /should be function/);
     });
 
-    it('没有定义任何rule时应该报错', function(){
-      assert.throws(function() {def(function() {});}, /No rules/);
+    it('没有定义任何rule时应该返回函数本身', function(){
+      var fn = function() {};
+      def(fn).should.eql(fn);
     });
 
     it('参数变量名相同时应该抛出异常', function() {
