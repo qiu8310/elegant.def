@@ -36,8 +36,9 @@ if test $# -gt 0; then
     && git-changelog -t $1 \
     && git-release $1 \
     && echo 'update gh-pages' \
-    && cp browser/* gh-pages && cd gh-pages && git add . -A && git commit -m "Release $1" \
-    && git push origin gh-pages --force && cd .. \
+    && cp browser/* gh-pages && git checkout gh-pages && cp gh-pages/* . \
+    && git add . -A && git commit -m "Release $1" \
+    && git push origin gh-pages && git checkout master \
     && echo 'npm publish ... ' \
     && npm publish
 else
