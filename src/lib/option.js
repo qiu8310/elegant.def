@@ -2,7 +2,7 @@
  * @module option
  */
 var _opts = {
-  applySelf: false
+  //applySelf: false  // 此配置已经无用了，现在采取的是自动根据函数中是否有 self 参数来判断是否 applySelf
 };
 
 /**

@@ -3,6 +3,16 @@ var assert = require('should');
 
 describe('HereDoc', function() {
 
+  context('#parseFunc', function() {
+    it('should parse empty function name, and empty arguments', function() {
+      assert.deepEqual(HereDoc.parseFunc(function() {}), {name: '', arguments: []});
+    });
+
+    it('should parse function name, and arguments', function() {
+      assert.deepEqual(HereDoc.parseFunc(function tt ( a, b ) {}), {name: 'tt', arguments: ['a', 'b']});
+    });
+  });
+
 
   context('#getFromFunc', function() {
 

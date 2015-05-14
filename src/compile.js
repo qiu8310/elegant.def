@@ -24,6 +24,9 @@ function compile (content, opts) {
 
   var ast = esprima.parse(content, {range: true, comment: true});
 
+  //require('fs').writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+  //process.exit();
+
   var docs = [];
   var findDocCfg = function(range) {
     for (var r, i = 0; i < docs.length; i++) {
@@ -38,8 +41,16 @@ function compile (content, opts) {
 
   base.eachArr(ast.comments, function(comment) {
     if (comment.type === 'Block') {
-      var cfg = HereDoc.parse(comment.value, {rules: Array, options: Object, defaults: Object});
-      if (cfg && cfg.rules && cfg.rules.length) {
+      var cfg = HereDoc.parse(
+        comment.value,
+        {name: Array, rule: Array, rules: Array, options: Object, defaults: Object}
+      );
+
+      // 转换成复数形式，兼容老版本写成 @rules 的形式
+      cfg.rules = (cfg.rule || []).concat(cfg.rules || []);
+      cfg.names = cfg.name || [];
+
+      if (cfg && cfg.rules.length) {
         cfg.rules = base.map(cfg.rules, parseRule);
         docs.push({range: comment.range, cfg: cfg});
       }
@@ -58,6 +69,13 @@ function compile (content, opts) {
       delete node.range;
       var cfg = findDocCfg(node.arguments[0].range);
       if (cfg) {
+        if (node.arguments[0].id) { cfg.names.push(node.arguments[0].id.name); }
+
+        cfg.arguments = base.map(node.arguments[0].params, function(it) { return it.name; });
+
+        if (!cfg.names.length) { delete cfg.names; }
+        if (!cfg.arguments.length) { delete cfg.arguments; }
+
         indexes.push({index: node.arguments[0].range[1], cfg: cfg});
       }
     }

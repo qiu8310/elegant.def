@@ -14,7 +14,7 @@ module.exports = function(def, assert) {
      */
 
     return self.b + '';
-  }, {"rules":[["string",[["b","int"]],[[0]]]]});
+  }, {"rules":[["string",[["b","int"]],[[0]]]],"arguments":["self"]});
 
 
   assert.equal(doubleInt(0), 0);

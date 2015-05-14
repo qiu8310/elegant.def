@@ -22,10 +22,10 @@
        * @defaults { start: 0, length: 10, step: 1 }
        * 
        * 定义配置规则
-       * @rules () -> array
-       * @rules (int start) -> array
-       * @rules (int start, int length) -> array
-       * @rules (int start, int length, int step) -> array
+       * @rule () -> array
+       * @rule (int start) -> array
+       * @rule (int start, int length) -> array
+       * @rule (int start, int length, int step) -> array
        */
     
       var i, result = [], count = 0;
@@ -74,7 +74,7 @@ def(function(str) {
   /**
    *  @defaults {str: 'Hello!'}
    *  @options {applySelf: false}
-   *  @rules ([string str]) -> *
+   *  @rule ([string str]) -> *
    */
    console.log(self.str);
 });
@@ -124,10 +124,9 @@ var outputContent = compile(inputContent, {defName: 'def'});
 ## HereDoc 中的配置项：
 
 * defaults  配置函数默认的变量值，保证变量值不会出现不存在的情况
-* options   一些配置项（详情查看 [def.option](#defoptionkey-value) 处的定义）
-* rules     主要的配置（详情直接看下面专门的描述）
+* rule     主要的配置（详情直接看下面专门的描述）
 
-### rules
+### rule
 
 > 思想其实就是使得函数的调用的每一个参数关联上一个 key，使程序员可以在函数内部通过这个 key 来使用参数
 > 另外就是还支持对这些参数的类型强制检查，并且支持设置默认值
@@ -141,7 +140,7 @@ _e.g:_
     (int length) -> int
     
     
-    // 可以配置可选的参数，下面的 rules 会匹配 fn(23) 及 fn('number', 23) 两种情况
+    // 可以配置可选的参数，下面的 rule 会匹配 fn(23) 及 fn('number', 23) 两种情况
     ([string pool='alpha'], int repeat) -> string
     
     
@@ -160,8 +159,7 @@ _e.g:_
 ## 注意事项
 
 * **通过HereDoc配置变量值时，使用的解析引擎是 [jsonfy](https://github.com/qiu8310/jsonfy)**
-* 如果 @rules 中参数的默认值是数组，需要要用 `<`, `>` 将数组包起来，要不会导致 jsonfy 解析失败
-* 如果没有定义任何 rules，会抛出异常，必须配置 rules，你可以配置一个最简单的 rules: ` ( ) -> * `
+* 如果没有定义任何 rule，会直接返回原函数
 * 当前 `returnType` 目前还没有任何功能性的作用，这个后期会改进的，写上也更方便别人理解
 
 ## API
@@ -196,6 +194,7 @@ _e.g:_
     def.unType('float');
     
 
+<!--
 ### def.option(key, value)
 
 配置，这是全局的配置，在定义函数时，可以指定一些具体的配置来覆盖全局配置，但这些配置只在其所在的函数内才有效
@@ -208,7 +207,7 @@ _e.g:_
     
     def(function(str) {
       /**
-       * @rules (string str) -> *
+       * @rule (string str) -> *
        */
        return this.str === str;   // 注意使用的是 this
     });
@@ -216,8 +215,7 @@ _e.g:_
 目前支持的配置:
 
 * applySelf: bool，默认为 `false`, 如果为 `true`，则在函数执行是可以直接使用 `this`，而不是其参数上的 `self`，另外它的参数也会变成和调用时使用的参数一致
-
-
+-->
 
 ## 系统默认支持的参数的类型
 
@@ -245,11 +243,11 @@ __大小写不敏感，可以按你自己的爱好来书写__
 * 支持 SourceMap
 * 加上返回值的监控(5)
 * 强化 `self` 功能(5)
-* rules 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rules
+* rule 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rule
 * 支持配置把字符串 '123' 也当成数字，并支持全局配置和对单个函数配置(NOT DONE)(用户自己可以通过新添加类型来支持）
 * 整合我的 spa-bootstrap
 * 支持新类型 enum: (string<enum> flag = ok|cancel, string foo)
-* 根据 rules 自动化测试
+* 根据 rule 自动化测试
 * self 里一定要加个函数 self.has(key)，因为习惯我们经常用 if (self.key) 模式去判断
 * 自动测试
 * silent def
@@ -272,7 +270,7 @@ __大小写不敏感，可以按你自己的爱好来书写__
 
 * 2015-01-13  可以用 `def.type` 来重新定义系统上已经存在的 type，但 `def.unType` 只能删除重新定义的，不会删除系统已有的（尚末测试）
 * 2015-01-12  在 self 中添加变量 `$defaults`，可以让函数体访问自己定义的默认值（尚末测试）
-* 2015-01-12  rules 中设置参数的默认 int 值为 0 或 负数 时，会将它们当作字符串（已加测试，待发布）
+* 2015-01-12  rule 中设置参数的默认 int 值为 0 或 负数 时，会将它们当作字符串（已加测试，待发布）
   
   > 主要是 isNumerical 函数少判断了为 0 和 负数 的情况
 

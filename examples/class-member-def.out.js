@@ -9,7 +9,7 @@ module.exports = function(def, assert) {
      * @rules (string words) -> string
      */
     return this.name + ' said ' + self.words;
-  }, {"rules":[["string",[["words","string"]],[[0]]]]});
+  }, {"rules":[["string",[["words","string"]],[[0]]]],"arguments":["self"]});
 
 
 

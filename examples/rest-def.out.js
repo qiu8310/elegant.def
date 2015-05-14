@@ -8,7 +8,7 @@ module.exports = function(def, assert) {
     return self.all.reduce(function(prev, curr) {
       return prev + curr;
     }, 0);
-  }, {"rules":[["int",[[1,"all","int"]],[[0]]]]});
+  }, {"rules":[["int",[[1,"all","int"]],[[0]]]],"arguments":["self"]});
 
 
   assert.equal(sum(1, 2, 3), 6);
@@ -22,7 +22,7 @@ module.exports = function(def, assert) {
      */
 
     return self.to.concat(self.others);
-  }, {"rules":[["array",[["to","array",[]],[1,"others","*"]],[[0,1]]]]});
+  }, {"rules":[["array",[["to","array",[]],[1,"others","*"]],[[0,1]]]],"arguments":["self"]});
 
   assert.deepEqual(concat([], 1, 2, 3), [1, 2, 3]);
   assert.deepEqual(concat([], 'a', true), ['a', true]);

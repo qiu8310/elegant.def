@@ -26,6 +26,9 @@ function def(fn, cfg) {
   cfg.options = base.merge({}, option.all, cfg.options);
   cfg.defaults = base.merge({}, cfg.defaults);
 
+  cfg.names = cfg.names || [];
+  cfg.arguments = cfg.arguments || [];
+
   return Self.def(fn, cfg);
 }
 

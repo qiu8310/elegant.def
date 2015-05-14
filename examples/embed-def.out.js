@@ -10,11 +10,11 @@ module.exports = function(def, assert) {
        * @rules ( int a ) -> int
        */
       return self.a * self.a;
-    }, {"rules":[["int",[["a","int"]],[[0]]]]});
+    }, {"rules":[["int",[["a","int"]],[[0]]]],"arguments":["self"]});
 
 
     return innerFn(self.a);
-  }, {"rules":[["int",[["a","int"]],[[0]]]]});
+  }, {"rules":[["int",[["a","int"]],[[0]]]],"arguments":["self"]});
 
 
   assert.equal(outerFn(1), 1);

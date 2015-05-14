@@ -30,8 +30,8 @@ Self.prototype.$has = function(key) {
   return (key in this.values);
 };
 
-Self.prototype.$get = function(key) {
-  return this.values[key];
+Self.prototype.$get = function(key, dft) {
+  return this.$has(key) ? this.values[key] : dft;
 };
 
 Self.def = function(fn, cfg) {
@@ -50,11 +50,12 @@ Self.def = function(fn, cfg) {
     // 执行原函数
     if (matches) {
       var self = new Self(matches, args, rule, cfg.defaults, cfg.options);
-      if (cfg.options.applySelf) {
-        return fn.apply(self, args);
-      } else {
-        return fn.call(binder, self);
-      }
+
+      return fn.apply(
+        cfg.arguments.indexOf('self') >= 0 ? binder : self,
+        base.map(cfg.arguments, function(arg) { return arg === 'self' ? self : self.$get(arg); })
+      );
+
     } else {
       throw new Error('Not found rule for arguments (' + args.join(', ') + ').');
     }

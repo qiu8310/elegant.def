@@ -73,7 +73,8 @@ HereDoc.parse = function (hereDocStr, keys) {
   return toObject(hereDocStr, _keys);
 };
 
-var reDoc = /(\/\*\*[\s\S]*?\*\/)/;
+var reDoc = /(\/\*\*[\s\S]*?\*\/)/,
+  reFn = /^function\s+(\w*)\s*\((.*)\)/;
 
 /**
  * 通过 fn.toString() 来得到函数内部定义的 hereDoc
@@ -85,5 +86,18 @@ HereDoc.getFromFunc = function(fn) {
   reDoc.test(fn.toString());
   return RegExp.$1 || false;
 };
+
+/**
+ * 得到函数的 arguments 及 name
+ */
+HereDoc.parseFunc = function(fn) {
+  reFn.test(fn.toString());
+  var args = base.trim(RegExp.$2);
+  var name = RegExp.$1;
+
+  args = args ? args.split(/\s*,\s*/) : [];
+  return {name: name, arguments: args};
+};
+
 
 module.exports = HereDoc;
