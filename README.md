@@ -7,78 +7,57 @@
 
 > 优雅的定义JavaScript函数
 
+## Usage
+  
+* Using `this`
 
-## 先来一个 Demo 感受一下：[在线编辑](http://qiu8310.github.io/elegant.def/)，[更多 Demo](https://github.com/qiu8310/elegant.def/tree/master/examples)
-
+  ```js
+  def(function index() {
     /**
-     * 生成一个 起始值为 start，长度为 length，步进值为 step 的整数数组
+     * @rule (Array arr [, Int num]) -> *
      */
-    var range = def(function() {
-      /**
-       * 设置配置，applySelf 为 true 表示可以在内部直接使用 this
-       * @options { applySelf: true }
-       * 
-       * 设置默认值
-       * @defaults { start: 0, length: 10, step: 1 }
-       * 
-       * 定义配置规则
-       * @rule () -> array
-       * @rule (int start) -> array
-       * @rule (int start, int length) -> array
-       * @rule (int start, int length, int step) -> array
-       */
-    
-      var i, result = [], count = 0;
-      for (i = this.start; count < this.length; count++, i += this.step) {
-        result.push(i);
-      }
-    
-      return result;
-    });
-    
-    /******* Below is test scripts ******/
-    
-    // start: 0, length: 10, step: 1
-    assert.deepEqual(range(),         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    
-    // start: 1, length: 10, step: 1
-    assert.deepEqual(range(1),        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    
-    // start: 6, length: 2, step: 1
-    assert.deepEqual(range(6, 2),     [6, 7]);
-    
-    // start: 2, length: 4, step: 2
-    assert.deepEqual(range(2, 4, 2),  [2, 4, 6, 8]);
+     return this.arr[this.num];
+  });
+  ```
+
+* Using `self`
+
+  ```js
+  def(function index(self) {
+    /**
+     * @rule (Array arr [, Int num]) -> *
+     */
+     return self.arr[self.num];
+  });
+  ```
+
+* Using arguments inject
+
+  ```js
+  def(function index(arr, other) {
+    /**
+     * @rule (Array arr [, Int num]) -> *
+     */
+     // Parameter `other` will always be `undefined`
+     return arr[this.num];
+  });
+  ```
   
-  
-## 安装
+## Install
+
 ### Node
 
     npm install elegant.def --save
     
     var def = require('elegant.def');
 
-### 浏览器
+### Browser
     
     bower install elegant.def --save
     
-    // 然后在页面中引入 elegant.def/browser/full.js 脚本即可
+    // Then use elegant.def/browser/full.js or elegant.def/browser/simple.js
 
 
-## 使用
-
-### def(fn)
-
-```
-def(function(str) {
-  /**
-   *  @defaults {str: 'Hello!'}
-   *  @options {applySelf: false}
-   *  @rule ([string str]) -> *
-   */
-   console.log(self.str);
-});
-```
 
 ### 代码需要压缩？
 
@@ -92,7 +71,7 @@ def(function(str) {
 
 #### 在 Node 脚本中处理
 
-```
+```js
 var compile = require('elegant.def/src/compile');
 var fs = require('fs');
 
@@ -193,6 +172,14 @@ _e.g:_
 
     def.unType('float');
     
+    
+### def.normalize(key)
+    
+将别名转化成原始名称
+
+_e.g:_
+
+    def.normalize('integer'); // => int
 
 <!--
 ### def.option(key, value)
@@ -242,13 +229,10 @@ __大小写不敏感，可以按你自己的爱好来书写__
 
 * 支持 SourceMap
 * 加上返回值的监控(5)
-* 强化 `self` 功能(5)
 * rule 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rule
-* 支持配置把字符串 '123' 也当成数字，并支持全局配置和对单个函数配置(NOT DONE)(用户自己可以通过新添加类型来支持）
 * 整合我的 spa-bootstrap
 * 支持新类型 enum: (string<enum> flag = ok|cancel, string foo)
 * 根据 rule 自动化测试
-* self 里一定要加个函数 self.has(key)，因为习惯我们经常用 if (self.key) 模式去判断
 * 自动测试
 * silent def
 

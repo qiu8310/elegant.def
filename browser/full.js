@@ -139,17 +139,20 @@
 				  }
 
 				  if (false !== (doc = HereDoc.getFromFunc(fn))) {
-				    cfg = HereDoc.parse(doc, {rules: Array, options: Object, defaults: Object});
+				    cfg = HereDoc.parse(doc);
 				    cfg.options = base.merge({}, option.all, cfg.options); // clone system options
-				    cfg.defaults = base.merge({}, cfg.defaults);
+
+				    var parsedFn = HereDoc.parseFunc(fn);
+				    if (parsedFn.name) { cfg.names.unshift(parsedFn.name); }
+				    cfg.arguments = parsedFn.arguments;
 				  }
 
-				  if (!cfg || !cfg.rules || !cfg.rules.length) {
+				  if (!cfg || !cfg.rules.length) {
 				    //throw new Error('No rules.');
 				    return fn;
 				  }
 
-				  cfg.rules = base.map(cfg.rules, Rule.parse);
+				  cfg.rules = Rule.unique(base.map(cfg.rules, Rule.parse));
 				  //console.log(JSON.stringify(cfg.rules, null, 2));
 
 				  return Self.def(fn, cfg);
@@ -366,73 +369,88 @@
 
 					var HereDoc = {};
 
-					var reDocItem = /^\s*\*\s*@(\w+)\s+(.*?)\s*$/mg;
+					var reDocTag = /^\s*@(\w+)\s/mg,
+					  reDocAsterisk = /^\s*\*[ \t]?/mg;
 
 					/**
 					 * 提取 hereDoc 中的关键字段，去掉行首和行尾的空格
 					 *
 					 * @param {String} hereDocStr
-					 * @param {Array} keys
 					 * @private
 					 */
-					function toObject(hereDocStr, keys) {
-					  var result = {}, map = {},
-					    allKeysMode = !keys.length;
+					function getTags(hereDocStr) {
 
-					  base.eachArr(keys, function(it) { map[it.key] = it; });
+					  hereDocStr = hereDocStr.replace(reDocAsterisk, '');
 
-					  hereDocStr.replace(reDocItem, function(_, key, val) {
-					    val = base.trim(val);
+					  var start = 0, tagKey, desc = '', tags = {};
 
-					    if (map[key] || allKeysMode) {
-					      switch (map[key] && map[key].type) {
-					        case Object:
-					          if (!base.isObject(result[key])) {
-					            result[key] = {};
-					          }
-					          base.merge(result[key], jsonfy(base.wrapInBrackets(val)));
-					          break;
+					  function addTag(key, val) {
+					    if (!(key in tags)) { tags[key] = []; }
+					    tags[key].push(base.trim(val));
+					  }
 
-					        case String:
-					          result[key] = val;
-					          break;
-
-					        default:
-					          if (!(key in result)) {
-					            result[key] = [];
-					          }
-					          result[key].push(val);
-					      }
+					  hereDocStr.replace(reDocTag, function(raw, key, index) {
+					    if (!start) {
+					      desc = base.trim(hereDocStr.substring(start, index));
+					    } else {
+					      addTag(tagKey, hereDocStr.substring(start, index));
 					    }
+
+					    tagKey = key;
+					    start = index + raw.length;
 					  });
-					  return result;
+
+					  if (tagKey) {
+					    addTag(tagKey, hereDocStr.substr(start));
+					  }
+
+					  tags.desc = desc;
+
+					  return tags;
 					}
+
+
+					var _firstLine = function (str) { return str.split(/[\r]?\n/).shift();},
+					  _firstWord = function(str) { /^(\w+)/.test(str); return RegExp.$1; };
 
 					/**
 					 * 解析 HereDoc 成对象
 					 *
 					 * @param {String} hereDocStr
-					 * @param {*} [keys = null]
+					 * @param {Boolean} [forDoc = false]
+					 * @returns {{rules: Array, names: Array, defaults: Object, options: Object}}
 					 *
 					 */
-					HereDoc.parse = function (hereDocStr, keys) {
-					  var _keys = [];
-					  if (base.isString(keys)) {
-					    _keys = [{key: keys, type: Array}];
-					  } else if (base.isObject(keys)) {
-					    base.eachObj(keys, function(val, key) {
-					      _keys.push({key: key, type: val});
-					    });
-					  } else if (base.isArray(keys)) {
-					    base.eachArr(keys, function(val) {
-					      _keys.push({key: val, type: Array});
-					    });
+					HereDoc.parse = function (hereDocStr, forDoc) {
+
+					  var tags = getTags(hereDocStr);
+					  var result = {};
+
+					  base.eachArr(['defaults', 'options'], function(k) {
+					    result[k] = tags[k] ? jsonfy(base.wrapInBrackets(_firstLine(tags[k].pop()))) : {};
+					  });
+
+					  result.rules = base.map((tags.rules || []).concat(tags.rule || []), _firstLine);
+					  result.names = base.map((tags.name ? [tags.name.pop()] : []).concat((tags.alias || [])), _firstWord);
+
+					  var map = {};
+					  result.names = base.filter(result.names, function(name) {
+					    var exists = name in map;
+					    map[name] = true;
+					    return name && !exists;
+					  });
+
+
+					  if (forDoc) {
+					    result.examples = tags.example || [];
+					    result.desc = tags.desc;
 					  }
 
-					  return toObject(hereDocStr, _keys);
+					  return result;
 					};
 
-					var reDoc = /(\/\*\*[\s\S]*?\*\/)/;
+					var reDoc = /(\/\*\*[\s\S]*?\*\/)/,
+					  reFn = /^function\s+(\w*)\s*\((.*)\)/;
 
 					/**
 					 * 通过 fn.toString() 来得到函数内部定义的 hereDoc
@@ -445,6 +463,19 @@
 					  return RegExp.$1 || false;
 					};
 
+					/**
+					 * 得到函数的 arguments 及 name
+					 */
+					HereDoc.parseFunc = function(fn) {
+					  reFn.test(fn.toString());
+					  var args = base.trim(RegExp.$2);
+					  var name = RegExp.$1;
+
+					  args = args ? args.split(/\s*,\s*/) : [];
+					  return {name: name, arguments: args};
+					};
+
+
 					module.exports = HereDoc;
 					if (typeof window !== 'undefined') { window.HereDoc = HereDoc; }
 				},
@@ -453,7 +484,7 @@
 					 * @module option
 					 */
 					var _opts = {
-					  applySelf: false
+					  //applySelf: false  // 此配置已经无用了，现在采取的是自动根据函数中是否有 self 参数来判断是否 applySelf
 					};
 
 					/**
@@ -642,7 +673,7 @@
 					      param.type = '*';
 					      this.next('*');
 					    } else {
-					      param.type = this.takeWord();
+					      param.type = type.normalize(this.takeWord());
 					    }
 
 					    this.next(/\s/);
@@ -694,7 +725,7 @@
 					 * 解析 HereDoc 中的一条 @rules 定义的规则
 					 *
 					 * @param {String} rule
-					 * @returns {{returnType: string, params: Array, roads: Array}}
+					 * @returns {{returnType: String, params: [{type: String, key: String, rest: Boolean}], roads: Array}}
 					 */
 					Rule.parse = function(rule) {
 
@@ -775,6 +806,33 @@
 					  return [parsedRule.returnType, params, parsedRule.roads];
 					};
 
+					/**
+					 * 将重复的 rule 中的 road 去掉
+					 * @param {Array} rules
+					 */
+					Rule.unique = function(rules) {
+					  var roads = {};
+					  return base.filter(rules, function(rule) {
+
+					    rule.roads = base.filter(rule.roads, function(road) {
+					      var key = base.map(road, function(index) {
+					        var param = rule.params[index];
+					        return (param.rest ? '...' : '') + param.type;
+					      }).join('|');
+
+					      var exists = key in roads;
+
+					      roads[key] = true;
+
+					      return !exists;
+					    });
+
+
+					    return rule.roads.length > 0;
+
+					  });
+					};
+
 
 					module.exports = Rule;
 					if (typeof window !== 'undefined') { window.Rule = Rule; }
@@ -812,8 +870,8 @@
 					  return (key in this.values);
 					};
 
-					Self.prototype.$get = function(key) {
-					  return this.values[key];
+					Self.prototype.$get = function(key, dft) {
+					  return this.$has(key) ? this.values[key] : dft;
 					};
 
 					Self.def = function(fn, cfg) {
@@ -832,11 +890,12 @@
 					    // 执行原函数
 					    if (matches) {
 					      var self = new Self(matches, args, rule, cfg.defaults, cfg.options);
-					      if (cfg.options.applySelf) {
-					        return fn.apply(self, args);
-					      } else {
-					        return fn.call(binder, self);
-					      }
+
+					      return fn.apply(
+					        cfg.arguments.indexOf('self') >= 0 ? binder : self,
+					        base.map(cfg.arguments, function(arg) { return arg === 'self' ? self : self.$get(arg); })
+					      );
+
 					    } else {
 					      throw new Error('Not found rule for arguments (' + args.join(', ') + ').');
 					    }
@@ -858,24 +917,28 @@
 
 					var all = type._all = {};
 
-					var basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(','),
+					var basicTypes = '*,int,number,string,object,array,function,arguments,bool,null,nature,positive,negative'.split(','),
 					  typeAliases = {
 					    integer: 'int',
 					    signed: 'int',
-					    bool: 'boolean',
+					    boolean: 'bool',
 					    unsigned: 'nature'
 					  };
 
-					function is(mix, type) {
-					  if (type in typeAliases) {
-					    type = typeAliases[type];
-					  }
+					function normalize(type) {
+					  type = type.toLowerCase();
+					  return (type in typeAliases) ? typeAliases[type] : type;
+					}
 
+					function is(mix, type) {
+					  type = normalize(type);
 					  switch (type) {
 					    case '*':
 					      return true;
 					    case 'int':
 					      return base.isInt(mix);
+					    case 'bool':
+					      return base.typeOf(mix) === 'boolean';
 					    case 'number':
 					      return base.isNumber(mix);
 					    case 'nature':
@@ -899,6 +962,8 @@
 					}
 
 					base.eachArr(basicTypes.concat(base.objectKeys(typeAliases)), function (key) { all[key] = is; });
+
+					type.normalize = normalize;
 
 					/**
 					 * 判断 mix 是否是 type 类型
@@ -996,6 +1061,9 @@
 				  cfg.rules = base.map(cfg.rules, Rule.decompress);
 				  cfg.options = base.merge({}, option.all, cfg.options);
 				  cfg.defaults = base.merge({}, cfg.defaults);
+
+				  cfg.names = cfg.names || [];
+				  cfg.arguments = cfg.arguments || [];
 
 				  return Self.def(fn, cfg);
 				}
@@ -1261,7 +1329,7 @@
 
 				'use strict';
 
-				(function(undef) {
+				(function(global, undef) {
 				  /**
 				   * One character
 				   *
@@ -1570,6 +1638,14 @@
 				      return pass;
 				    },
 
+
+				    /**
+				     *  Peek next one or specified length
+				     */
+				    peek: function(len) {
+				      return this.str.substr(this.pos + 1, len || 1);
+				    },
+
 				    /**
 				     * Get peek of the rest string.
 				     *
@@ -1608,11 +1684,11 @@
 				  sscan.Scanner = Scanner;
 
 				  // Export to window and node
-				  if (typeof window !== 'undefined') { window.sscan = sscan; }
+				  global.sscan = sscan;
 				  module.exports = sscan;
 				if (typeof window !== 'undefined') { window.sscan = sscan; }
 
-				})();
+				})(this);
 			}
 		}
 	}

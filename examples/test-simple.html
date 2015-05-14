@@ -3,13 +3,13 @@
 <head lang="en">
   <meta charset="UTF-8">
   <title></title>
-  <script src="../dist/simple.js"></script>
+  <script src="../browser/simple.js"></script>
 </head>
 <body>
 
 <script>
 
-  var range=def(function(self){var i,result=[],count=0;for(i=self.start;count<self.length;count++,i+=self.step){result.push(i);}return result;},{'options':{'applySelf':false},'defaults':{'start':0,'length':10,'step':1},'rules':[['array',[],[[]]],['array',[['start','int']],[[0]]],['array',[['start','int'],['length','int']],[[0,1]]],['array',[['start','int'],['length','int'],['step','int']],[[0,1,2]]]]});
+  var range=def(function(){var a,c=[],b=0;for(a=this.start;b<this.length;b++,a+=this.step){c.push(a)}return c},{defaults:{start:0,length:10,step:1},rules:[["array",[],[[]]],["array",[["start","int"]],[[0]]],["array",[["start","int"],["length","int"]],[[0,1]]],["array",[["start","int"],["length","int"],["step","int"]],[[0,1,2]]]]});
 
   console.log(range());
   console.log(range(1));

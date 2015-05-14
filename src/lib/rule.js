@@ -99,7 +99,7 @@ function _parseRuleArgs(args) {
       param.type = '*';
       this.next('*');
     } else {
-      param.type = this.takeWord();
+      param.type = type.normalize(this.takeWord());
     }
 
     this.next(/\s/);
@@ -151,7 +151,7 @@ function _parseRuleArgs(args) {
  * 解析 HereDoc 中的一条 @rules 定义的规则
  *
  * @param {String} rule
- * @returns {{returnType: string, params: Array, roads: Array}}
+ * @returns {{returnType: String, params: [{type: String, key: String, rest: Boolean}], roads: Array}}
  */
 Rule.parse = function(rule) {
 
@@ -230,6 +230,33 @@ Rule.compress = function(parsedRule) {
     return rtn;
   });
   return [parsedRule.returnType, params, parsedRule.roads];
+};
+
+/**
+ * 将重复的 rule 中的 road 去掉
+ * @param {Array} rules
+ */
+Rule.unique = function(rules) {
+  var roads = {};
+  return base.filter(rules, function(rule) {
+
+    rule.roads = base.filter(rule.roads, function(road) {
+      var key = base.map(road, function(index) {
+        var param = rule.params[index];
+        return (param.rest ? '...' : '') + param.type;
+      }).join('|');
+
+      var exists = key in roads;
+
+      roads[key] = true;
+
+      return !exists;
+    });
+
+
+    return rule.roads.length > 0;
+
+  });
 };
 
 

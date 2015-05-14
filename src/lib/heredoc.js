@@ -7,70 +7,84 @@ var base = require('./base');
 
 var HereDoc = {};
 
-var reDocItem = /^\s*\*\s*@(\w+)\s+(.*?)\s*$/mg;
+var reDocTag = /^\s*@(\w+)\s/mg,
+  reDocAsterisk = /^\s*\*[ \t]?/mg;
 
 /**
  * 提取 hereDoc 中的关键字段，去掉行首和行尾的空格
  *
  * @param {String} hereDocStr
- * @param {Array} keys
  * @private
  */
-function toObject(hereDocStr, keys) {
-  var result = {}, map = {},
-    allKeysMode = !keys.length;
+function getTags(hereDocStr) {
 
-  base.eachArr(keys, function(it) { map[it.key] = it; });
+  hereDocStr = hereDocStr.replace(reDocAsterisk, '');
 
-  hereDocStr.replace(reDocItem, function(_, key, val) {
-    val = base.trim(val);
+  var start = 0, tagKey, desc = '', tags = {};
 
-    if (map[key] || allKeysMode) {
-      switch (map[key] && map[key].type) {
-        case Object:
-          if (!base.isObject(result[key])) {
-            result[key] = {};
-          }
-          base.merge(result[key], jsonfy(base.wrapInBrackets(val)));
-          break;
+  function addTag(key, val) {
+    if (!(key in tags)) { tags[key] = []; }
+    tags[key].push(base.trim(val));
+  }
 
-        case String:
-          result[key] = val;
-          break;
-
-        default:
-          if (!(key in result)) {
-            result[key] = [];
-          }
-          result[key].push(val);
-      }
+  hereDocStr.replace(reDocTag, function(raw, key, index) {
+    if (!start) {
+      desc = base.trim(hereDocStr.substring(start, index));
+    } else {
+      addTag(tagKey, hereDocStr.substring(start, index));
     }
+
+    tagKey = key;
+    start = index + raw.length;
   });
-  return result;
+
+  if (tagKey) {
+    addTag(tagKey, hereDocStr.substr(start));
+  }
+
+  tags.desc = desc;
+
+  return tags;
 }
+
+
+var _firstLine = function (str) { return str.split(/[\r]?\n/).shift();},
+  _firstWord = function(str) { /^(\w+)/.test(str); return RegExp.$1; };
 
 /**
  * 解析 HereDoc 成对象
  *
  * @param {String} hereDocStr
- * @param {*} [keys = null]
+ * @param {Boolean} [forDoc = false]
+ * @returns {{rules: Array, names: Array, defaults: Object, options: Object}}
  *
  */
-HereDoc.parse = function (hereDocStr, keys) {
-  var _keys = [];
-  if (base.isString(keys)) {
-    _keys = [{key: keys, type: Array}];
-  } else if (base.isObject(keys)) {
-    base.eachObj(keys, function(val, key) {
-      _keys.push({key: key, type: val});
-    });
-  } else if (base.isArray(keys)) {
-    base.eachArr(keys, function(val) {
-      _keys.push({key: val, type: Array});
-    });
+HereDoc.parse = function (hereDocStr, forDoc) {
+
+  var tags = getTags(hereDocStr);
+  var result = {};
+
+  base.eachArr(['defaults', 'options'], function(k) {
+    result[k] = tags[k] ? jsonfy(base.wrapInBrackets(_firstLine(tags[k].pop()))) : {};
+  });
+
+  result.rules = base.map((tags.rules || []).concat(tags.rule || []), _firstLine);
+  result.names = base.map((tags.name ? [tags.name.pop()] : []).concat((tags.alias || [])), _firstWord);
+
+  var map = {};
+  result.names = base.filter(result.names, function(name) {
+    var exists = name in map;
+    map[name] = true;
+    return name && !exists;
+  });
+
+
+  if (forDoc) {
+    result.examples = tags.example || [];
+    result.desc = tags.desc;
   }
 
-  return toObject(hereDocStr, _keys);
+  return result;
 };
 
 var reDoc = /(\/\*\*[\s\S]*?\*\/)/,

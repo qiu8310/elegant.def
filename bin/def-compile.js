@@ -3,6 +3,7 @@
 
 var program = require('commander');
 var fs = require('fs');
+var glob = require('glob').sync;
 var compile = require('../src/compile');
 
 program
@@ -17,7 +18,8 @@ program
 if (!program.args.length) {
   program.help();
 } else {
-  program.args.forEach(function(file) {
+
+  var parse = function(file) {
     var inContent = fs.readFileSync(file).toString();
     var outContent = compile(inContent, program);
 
@@ -28,5 +30,7 @@ if (!program.args.length) {
       fs.writeFileSync(outFile, outContent);
       console.log('Write to ' + outFile + ' ok!\r\n');
     }
-  });
+  };
+
+  program.args.forEach(function(pattern) { glob(pattern).forEach(parse); });
 }

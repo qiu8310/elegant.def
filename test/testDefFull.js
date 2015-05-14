@@ -103,7 +103,7 @@ describe('defFull', function() {
          * @rules (array array, string type) -> *
          * @rules (function function, string type) -> *
          * @rules (arguments arguments, string type) -> *
-         * @rules (boolean boolean, string type) -> *
+         * @rules (boolean bool, string type) -> *
          * @rules (null null, string type) -> *
          *
          *
@@ -138,8 +138,8 @@ describe('defFull', function() {
       fn(function(){}, 'function').should.eql(true);
       fn(args, 'arguments').should.eql(true);
 
-      fn(true, 'boolean').should.eql(true);
-      fn(false, 'boolean').should.eql(false); // 返回的是参数的值，所以是 false
+      fn(true, 'bool').should.eql(true);
+      fn(false, 'bool').should.eql(false); // 返回的是参数的值，所以是 false
       fn(null, 'null').should.eql(false);
     });
 
@@ -157,7 +157,7 @@ describe('defFull', function() {
     it('整数的默认值可以正常解析', function() {
       var fn = def(function(self) {
         /**
-         * @rules ([int a = <0>, int b = <1>, int c = <-1>]) -> int
+         * @rules ([int a = 0, int b = 1, int c = -1]) -> int
          */
         return self.a === 0 && self.b === 1 && self.c === -1;
       });

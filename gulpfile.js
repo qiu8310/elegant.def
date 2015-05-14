@@ -61,9 +61,12 @@ gulp.task('watch', ['test'], function () {
 
 gulp.task('example', function() {
   var compile = require('./src/compile');
+  var cp = require('child_process');
   require('./examples/meta').forEach(function(key) {
     fs.writeFileSync('./examples/' + key + '.out.js',
       compile(fs.readFileSync('./examples/' + key + '.js').toString()));
+
+    cp.execSync('node ./bin/def-doc.js ./examples/' + key + '.js -o "./examples/' + key + '.md"');
   });
 });
 

@@ -8,24 +8,28 @@ var type = {};
 
 var all = type._all = {};
 
-var basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(','),
+var basicTypes = '*,int,number,string,object,array,function,arguments,bool,null,nature,positive,negative'.split(','),
   typeAliases = {
     integer: 'int',
     signed: 'int',
-    bool: 'boolean',
+    boolean: 'bool',
     unsigned: 'nature'
   };
 
-function is(mix, type) {
-  if (type in typeAliases) {
-    type = typeAliases[type];
-  }
+function normalize(type) {
+  type = type.toLowerCase();
+  return (type in typeAliases) ? typeAliases[type] : type;
+}
 
+function is(mix, type) {
+  type = normalize(type);
   switch (type) {
     case '*':
       return true;
     case 'int':
       return base.isInt(mix);
+    case 'bool':
+      return base.typeOf(mix) === 'boolean';
     case 'number':
       return base.isNumber(mix);
     case 'nature':
@@ -49,6 +53,8 @@ function is(mix, type) {
 }
 
 base.eachArr(basicTypes.concat(base.objectKeys(typeAliases)), function (key) { all[key] = is; });
+
+type.normalize = normalize;
 
 /**
  * 判断 mix 是否是 type 类型

@@ -311,7 +311,7 @@
 					 * @module option
 					 */
 					var _opts = {
-					  applySelf: false
+					  //applySelf: false  // 此配置已经无用了，现在采取的是自动根据函数中是否有 self 参数来判断是否 applySelf
 					};
 
 					/**
@@ -431,8 +431,8 @@
 					  return (key in this.values);
 					};
 
-					Self.prototype.$get = function(key) {
-					  return this.values[key];
+					Self.prototype.$get = function(key, dft) {
+					  return this.$has(key) ? this.values[key] : dft;
 					};
 
 					Self.def = function(fn, cfg) {
@@ -451,11 +451,12 @@
 					    // 执行原函数
 					    if (matches) {
 					      var self = new Self(matches, args, rule, cfg.defaults, cfg.options);
-					      if (cfg.options.applySelf) {
-					        return fn.apply(self, args);
-					      } else {
-					        return fn.call(binder, self);
-					      }
+
+					      return fn.apply(
+					        cfg.arguments.indexOf('self') >= 0 ? binder : self,
+					        base.map(cfg.arguments, function(arg) { return arg === 'self' ? self : self.$get(arg); })
+					      );
+
 					    } else {
 					      throw new Error('Not found rule for arguments (' + args.join(', ') + ').');
 					    }
@@ -477,24 +478,28 @@
 
 					var all = type._all = {};
 
-					var basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(','),
+					var basicTypes = '*,int,number,string,object,array,function,arguments,bool,null,nature,positive,negative'.split(','),
 					  typeAliases = {
 					    integer: 'int',
 					    signed: 'int',
-					    bool: 'boolean',
+					    boolean: 'bool',
 					    unsigned: 'nature'
 					  };
 
-					function is(mix, type) {
-					  if (type in typeAliases) {
-					    type = typeAliases[type];
-					  }
+					function normalize(type) {
+					  type = type.toLowerCase();
+					  return (type in typeAliases) ? typeAliases[type] : type;
+					}
 
+					function is(mix, type) {
+					  type = normalize(type);
 					  switch (type) {
 					    case '*':
 					      return true;
 					    case 'int':
 					      return base.isInt(mix);
+					    case 'bool':
+					      return base.typeOf(mix) === 'boolean';
 					    case 'number':
 					      return base.isNumber(mix);
 					    case 'nature':
@@ -518,6 +523,8 @@
 					}
 
 					base.eachArr(basicTypes.concat(base.objectKeys(typeAliases)), function (key) { all[key] = is; });
+
+					type.normalize = normalize;
 
 					/**
 					 * 判断 mix 是否是 type 类型
@@ -615,6 +622,9 @@
 				  cfg.rules = base.map(cfg.rules, Rule.decompress);
 				  cfg.options = base.merge({}, option.all, cfg.options);
 				  cfg.defaults = base.merge({}, cfg.defaults);
+
+				  cfg.names = cfg.names || [];
+				  cfg.arguments = cfg.arguments || [];
 
 				  return Self.def(fn, cfg);
 				}

@@ -25,18 +25,11 @@ function def(fn) {
   }
 
   if (false !== (doc = HereDoc.getFromFunc(fn))) {
-    cfg = HereDoc.parse(doc, {name: Array, rule: Array, rules: Array, options: Object, defaults: Object});
+    cfg = HereDoc.parse(doc);
     cfg.options = base.merge({}, option.all, cfg.options); // clone system options
-    cfg.defaults = base.merge({}, cfg.defaults);
-
-    // 转换成复数形式，兼容老版本写成 @rules 的形式
-    cfg.rules = (cfg.rule || []).concat(cfg.rules || []);
-    cfg.names = cfg.name || []; // 新添加函数名称的定义
 
     var parsedFn = HereDoc.parseFunc(fn);
-
-    if (parsedFn.name) { cfg.names.push(parsedFn.name); }
-
+    if (parsedFn.name) { cfg.names.unshift(parsedFn.name); }
     cfg.arguments = parsedFn.arguments;
   }
 
@@ -45,7 +38,7 @@ function def(fn) {
     return fn;
   }
 
-  cfg.rules = base.map(cfg.rules, Rule.parse);
+  cfg.rules = Rule.unique(base.map(cfg.rules, Rule.parse));
   //console.log(JSON.stringify(cfg.rules, null, 2));
 
   return Self.def(fn, cfg);
