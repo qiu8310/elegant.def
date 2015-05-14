@@ -2,11 +2,10 @@ module.exports = function(def, assert) {
 
   var doubleInt = def(function() {
     /**
-     * @options { applySelf: true }
      * @rules (int a) -> int
      */
     return this.a + this.a;
-  }, {"options":{"applySelf":true},"rules":[["int",[["a","int"]],[[0]]]]});
+  }, {"rules":[["int",[["a","int"]],[[0]]]]});
 
   var intToStr = def(function(self) {
     /**

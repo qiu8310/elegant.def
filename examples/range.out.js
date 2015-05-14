@@ -5,7 +5,6 @@ module.exports = function(def, assert) {
    */
   var range = def(function() {
     /**
-     * @options { applySelf: true }
      * @defaults { start: 0, length: 10, step: 1 }
      * @rules () -> array
      * @rules (int start) -> array
@@ -18,7 +17,7 @@ module.exports = function(def, assert) {
       result.push(i);
     }
     return result;
-  }, {"options":{"applySelf":true},"defaults":{"start":0,"length":10,"step":1},"rules":[["array",[],[[]]],["array",[["start","int"]],[[0]]],["array",[["start","int"],["length","int"]],[[0,1]]],["array",[["start","int"],["length","int"],["step","int"]],[[0,1,2]]]]});
+  }, {"defaults":{"start":0,"length":10,"step":1},"rules":[["array",[],[[]]],["array",[["start","int"]],[[0]]],["array",[["start","int"],["length","int"]],[[0,1]]],["array",[["start","int"],["length","int"],["step","int"]],[[0,1,2]]]]});
 
   // Test
 

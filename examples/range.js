@@ -5,7 +5,6 @@ module.exports = function(def, assert) {
    */
   var range = def(function() {
     /**
-     * @options { applySelf: true }
      * @defaults { start: 0, length: 10, step: 1 }
      * @rules () -> array
      * @rules (int start) -> array

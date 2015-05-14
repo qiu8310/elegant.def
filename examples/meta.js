@@ -5,5 +5,6 @@ module.exports = [
   'rest-def',
   'multiple-def',
   'embed-def',
-  'class-member-def'
+  'class-member-def',
+  'arguments'
 ];

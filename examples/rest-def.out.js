@@ -31,11 +31,10 @@ module.exports = function(def, assert) {
 
   var fn = def(function() {
     /**
-     * @options { applySelf: true }
      * @rules ( int a, int ...b, string c ) -> string
      */
     return this.a + this.b.join('') + this.c;
-  }, {"options":{"applySelf":true},"rules":[["string",[["a","int"],[1,"b","int"],["c","string"]],[[0,1,2]]]]});
+  }, {"rules":[["string",[["a","int"],[1,"b","int"],["c","string"]],[[0,1,2]]]]});
 
   assert.deepEqual(fn(1, 2, 3, 'a'), '123a');
   assert.throws(function() { fn(1, 'a'); });

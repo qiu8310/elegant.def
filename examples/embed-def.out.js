@@ -1,6 +1,6 @@
 module.exports = function(def, assert) {
 
-  var outerFn = def(function(self) {
+  var outerFn = def(function someName(self) {
     /**
      * @rules ( int a ) -> int
      */
@@ -14,7 +14,7 @@ module.exports = function(def, assert) {
 
 
     return innerFn(self.a);
-  }, {"rules":[["int",[["a","int"]],[[0]]]],"arguments":["self"]});
+  }, {"rules":[["int",[["a","int"]],[[0]]]],"names":["someName"],"arguments":["self"]});
 
 
   assert.equal(outerFn(1), 1);

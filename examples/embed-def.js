@@ -1,6 +1,6 @@
 module.exports = function(def, assert) {
 
-  var outerFn = def(function(self) {
+  var outerFn = def(function someName(self) {
     /**
      * @rules ( int a ) -> int
      */

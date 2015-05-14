@@ -2,7 +2,6 @@ module.exports = function(def, assert) {
 
   var doubleInt = def(function() {
     /**
-     * @options { applySelf: true }
      * @rules (int a) -> int
      */
     return this.a + this.a;

@@ -5,13 +5,12 @@ module.exports = function(def, assert) {
    */
   var random = def(function() {
     /**
-     * @options { applySelf: true }
      * @defaults { max: 10 }
      * @rules ([int min = 0, [int max]]) -> int
      */
     if (this.min > this.max) { throw new Error(); }
     return this.min + Math.floor(Math.random() * (this.max - this.min + 1))
-  }, {"options":{"applySelf":true},"defaults":{"max":10},"rules":[["int",[["min","int",0],["max","int"]],[[],[0],[0,1]]]]});
+  }, {"defaults":{"max":10},"rules":[["int",[["min","int",0],["max","int"]],[[],[0],[0,1]]]]});
 
   // Test
   for (var r, i = 0; i < 10; i++) {

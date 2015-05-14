@@ -5,7 +5,6 @@ module.exports = function(def, assert) {
    */
   var random = def(function() {
     /**
-     * @options { applySelf: true }
      * @defaults { max: 10 }
      * @rules ([int min = 0, [int max]]) -> int
      */

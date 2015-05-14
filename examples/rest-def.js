@@ -31,7 +31,6 @@ module.exports = function(def, assert) {
 
   var fn = def(function() {
     /**
-     * @options { applySelf: true }
      * @rules ( int a, int ...b, string c ) -> string
      */
     return this.a + this.b.join('') + this.c;

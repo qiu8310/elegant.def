@@ -5,7 +5,8 @@ var compile = require('../src/compile'),
 describe('defCompile', function() {
   context('examples', function() {
 
-    var helper;
+    var helper,
+      keys = require('../examples/meta');
     before(function() {
       helper = function(key) {
         var inCont = fs.readFileSync('examples/' + key + '.js').toString();
@@ -14,8 +15,10 @@ describe('defCompile', function() {
       };
     });
 
-    it('#random', function() { helper('random'); });
-    it('#range', function() { helper('range'); });
+    //it.only('#range', function() { helper('range'); });
 
+    keys.forEach(function(key) {
+      it('#' + key, function() { helper(key); });
+    });
   });
 });

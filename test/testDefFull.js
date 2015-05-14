@@ -211,18 +211,13 @@ describe('defFull', function() {
       def.option('applySelf', false);
       var fn = def(function(str) {
         /**
-         * @options {applySelf: true}
          * @rules (string str) -> *
          */
         return (str === this.$get('str') && str === 'ha' && this.$has('str'));
       });
 
       fn('ha').should.eql(true);
-      // 定义在函数中的 options 无法修改全局的 options
-      def.option('applySelf').should.eql(false);
 
-
-      def.option('applySelf', true);
       fn = def(function(str) {
         /**
          * @rules (string str) -> *
@@ -230,8 +225,6 @@ describe('defFull', function() {
         return (str === this.str && str === 'ha');
       });
       fn('ha').should.eql(true);
-      def.option('applySelf', false);
-
     });
   });
 
