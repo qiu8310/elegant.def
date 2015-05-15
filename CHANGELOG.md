@@ -1,4 +1,14 @@
 
+3.0.0-alpha.1 / 2015-05-15
+==========================
+
+  * rule 优化：自动去除重复的 rule (根据每条 road 上的所有参数类型来判断是否重复)
+  * 文档生成：可以利用使用了 def 的 js 文件生成 markdown 文档
+  * 自动 applySelf：去掉了 applySelf 配置，让程序自动根据 arguments 中是否有 self 来自动 applySelf
+  * @rule 兼容：配置 rules 的时候，支持使用 @rule 和 @rules 两种形式
+  * 支持定义函数名称和别名：保存了定义的函数名称在 cfg.names 数组中，函数名称可以在定义函数时指定，也可以在 heredoc 中用 @name 或 @alias 去指定
+  
+
 2.0.0 / 2015-04-25
 ==================
 

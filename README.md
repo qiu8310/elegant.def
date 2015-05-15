@@ -5,7 +5,7 @@
 [![Dependency Status][daviddm-url]][daviddm-image]
 [![Coverage Status][coveralls-image]][coveralls-url]
 
-> 优雅的定义JavaScript函数
+> Elegant define javascript function
 
 ## Usage
   
@@ -59,93 +59,98 @@
 
 
 
-### 代码需要压缩？
+### Code Need Minimize？
 
-代码压缩会将注释全部删除了，所以在代码压缩前需要预处理一下，可以使用以下几种方法来处理
+When code minimized, comment will be removed, include the def's heredoc comment, so you must compile it before minimizing your code.
 
-#### 命令行
+You can using below 5 methods to compile your code:
 
-先全局安装 `elegant.def`：`npm install -g elegant.def`
+* CLI
+  
+  1. Global install `elegant.def`
+  
+  ```bash
+  npm install -g elegant.def
+  ```
+  
+  2. Compile your file
+  
+  ```bash
+  def-compile path/to/source/file
+  ```
+  
 
-再使用 `def-compile` 命令：`def-compile path/to/source/file`
+* Node script
 
-#### 在 Node 脚本中处理
+  ```js
+  var compile = require('elegant.def/src/compile');
+  var fs = require('fs');
+  
+  var inputContent = fs.readFileSync('path/to/source/file').toString();
+  var outputContent = compile(inputContent, {defName: 'def'});
+  
+  // process the outputContent 
+  // ...
+  ```
 
-```js
-var compile = require('elegant.def/src/compile');
-var fs = require('fs');
+* Online compile
 
-var inputContent = fs.readFileSync('path/to/source/file').toString();
-var outputContent = compile(inputContent, {defName: 'def'});
+  [http://qiu8310.github.io/elegant.def/](http://qiu8310.github.io/elegant.def/)
 
-// process the outputContent 
-// ...
-```
+* gulp-def
 
-#### 在线处理
+  [http://github.com/qiu8310/gulp-def/](http://github.com/qiu8310/gulp-def/)
 
-[http://qiu8310.github.io/elegant.def/](http://qiu8310.github.io/elegant.def/)
+* grunt-def
 
-#### gulp-def
+  [http://github.com/qiu8310/grunt-def/](http://github.com/qiu8310/grunt-def/)
 
-[http://github.com/qiu8310/gulp-def/](http://github.com/qiu8310/gulp-def/)
+### Surprise
 
-#### grunt-def
+when your code is compiled, you can use a smaller elegant.def script.
 
-[http://github.com/qiu8310/grunt-def/](http://github.com/qiu8310/grunt-def/)
-
-### 惊喜：代码预处理后，可以引用一个更小版本的脚本
-
-* Node 中引用小版本 def 脚本：`var def = require('elegant.def/src/simple')`
-* 浏览器中引用小版本 def 脚本：`elegant.def/browser/simple.js`
+* Small version in node: `var def = require('elegant.def/src/simple')`
+* Small version in browser: `elegant.def/browser/simple.js`
 
 
-## HereDoc 中的配置项：
+## Config items in heredoc
 
-* defaults  配置函数默认的变量值，保证变量值不会出现不存在的情况
-* rule     主要的配置（详情直接看下面专门的描述）
+ ITEM       |   DESCRIPTION
+----------- | ---------------
+`@name`     | `String`, Function name
+`@alias`    | `String`, Function name alias
+`@defaults` | `Object`, Function's arguments default values
+`@rule`     | The main config item (Continue to see more detail)
+
 
 ### rule
 
-> 思想其实就是使得函数的调用的每一个参数关联上一个 key，使程序员可以在函数内部通过这个 key 来使用参数
-> 另外就是还支持对这些参数的类型强制检查，并且支持设置默认值
-
-_简单的格式:_ `(type_1 name_1, [type_2 name_2 = defaultValue]) -> returnType`
+_Format:_ `(type_1 name_1, [type_2 name_2 = defaultValue]) -> returnType`
 
 _e.g:_
 
-    // 基本
+    // Basic
     (int min, int max) -> int
     (int length) -> int
     
-    
-    // 可以配置可选的参数，下面的 rule 会匹配 fn(23) 及 fn('number', 23) 两种情况
+    // Optional argument with a default value
     ([string pool='alpha'], int repeat) -> string
-    
-    
-    
-    // 来个高大上的...(我瞎写的)
-    // 能匹配这些路径（按顺序匹配）：
-    // max
-    // length max
-    // min length max
-    // foo min length max
-    
-    ([[[ string foo, ] int min,] int length,] int max) -> *
-    
+
+    // Rest argument
+    (int ...numbers, string foo) -> int
     
 
-## 注意事项
+## Note
 
-* **通过HereDoc配置变量值时，使用的解析引擎是 [jsonfy](https://github.com/qiu8310/jsonfy)**
-* 如果没有定义任何 rule，会直接返回原函数
-* 当前 `returnType` 目前还没有任何功能性的作用，这个后期会改进的，写上也更方便别人理解
+* Values in heredoc (include @defaults and @rule's arguments value) is parsed by [jsonfy](https://github.com/qiu8310/jsonfy).
+* If no rule defined, it will return the original function.
+* For now, `returnType` was just used as understanding the rule's return type, no other use.
 
 ## API
 
 ### def.is(mix, type)
 
-判断变量 mix 的类型是否就是 type 所指定的类型
+Judge if `mix` is `type`
 
 _e.g:_ 
 
@@ -154,9 +159,10 @@ _e.g:_
 
 ### def.type(key, fn)
 
-定义一个新的类型名 key， fn 是用来判断任意一个变量是否是你所指定的这个新类型
+Define a new type or overwrite an exists type.
 
-**可以通过此函数覆盖系统默认的参数类型**
+`fn` is used to judge if a parameter is your defined type.
+
 
 _e.g:_
 
@@ -166,7 +172,7 @@ _e.g:_
 
 ### def.unType(key), def.untype(key)
 
-删除已有的类型
+Delete a defined type name.
 
 _e.g:_
 
@@ -175,7 +181,7 @@ _e.g:_
     
 ### def.normalize(key)
     
-将别名转化成原始名称
+Transform type alias name to it original name.
 
 _e.g:_
 
@@ -204,11 +210,11 @@ _e.g:_
 * applySelf: bool，默认为 `false`, 如果为 `true`，则在函数执行是可以直接使用 `this`，而不是其参数上的 `self`，另外它的参数也会变成和调用时使用的参数一致
 -->
 
-## 系统默认支持的参数的类型
+## Support types
 
-__大小写不敏感，可以按你自己的爱好来书写__
+__Case Insensitive__
 
- TYPE                   | 说明
+ TYPE                   | DESCRIPTION
  ---------------------- | -----------
  int, integer, signed   | 整数
  unsigned, nature       | 大于等于0的整数（自然数）
@@ -248,7 +254,7 @@ __大小写不敏感，可以按你自己的爱好来书写__
   ```
 
 
-## 更新日志
+## HISTORY
 
 * v1.0.0 之后更新日志移入到 [CHANGELOG.md](CHANGELOG.md)
 
@@ -257,8 +263,6 @@ __大小写不敏感，可以按你自己的爱好来书写__
 * 2015-01-12  rule 中设置参数的默认 int 值为 0 或 负数 时，会将它们当作字符串（已加测试，待发布）
   
   > 主要是 isNumerical 函数少判断了为 0 和 负数 的情况
-
-
  
 
 [doc-url]: http://inch-ci.org/github/qiu8310/elegant.def
