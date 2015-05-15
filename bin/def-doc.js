@@ -59,7 +59,7 @@ if (!program.args.length) {
         result.push('__Examples: __');
       }
       docObj.examples.forEach(function(ex) {
-        result.push('```');
+        result.push('```js');
         result.push(ex);
         result.push('```');
       });
