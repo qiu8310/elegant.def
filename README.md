@@ -67,19 +67,9 @@ You can using below 5 methods to compile your code:
 
 * CLI
   
-  1. Global install `elegant.def`
-  
-  ```bash
-  npm install -g elegant.def
-  ```
-  
-  2. Compile your file
-  
-  ```bash
-  def-compile path/to/source/file
-  ```
-  
-
+  1. Global install `elegant.def`: `npm install -g elegant.def`
+  2. Compile your file: `def-compile path/to/source/file`
+ 
 * Node script
 
   ```js
@@ -111,6 +101,12 @@ when your code is compiled, you can use a smaller elegant.def script.
 
 * Small version in node: `var def = require('elegant.def/src/simple')`
 * Small version in browser: `elegant.def/browser/simple.js`
+
+
+## Doc generate
+
+1. Global install this package: `npm install -g elegant.def`
+2. Using `def-doc` cli command: `def-doc path/to/*.js`
 
 
 ## Config items in heredoc

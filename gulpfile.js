@@ -66,11 +66,11 @@ gulp.task('example', function() {
     fs.writeFileSync('./examples/' + key + '.out.js',
       compile(fs.readFileSync('./examples/' + key + '.js').toString()));
 
-    cp.execSync('node ./bin/def-doc.js ./examples/' + key + '.js -o "./examples/' + key + '.md"');
+    cp.exec('node ./bin/def-doc.js ./examples/' + key + '.js -o "./examples/' + key + '.md"');
   });
 });
 
-gulp.task('test', ['example', 'lint', 'istanbul']);
+gulp.task('test', ['lint', 'istanbul']);
 
 gulp.task('release', function() {
   var make = function(file) {
