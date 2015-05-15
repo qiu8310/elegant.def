@@ -139,16 +139,20 @@
 				  }
 
 				  if (false !== (doc = HereDoc.getFromFunc(fn))) {
-				    cfg = HereDoc.parse(doc, {rules: Array, options: Object, defaults: Object});
+				    cfg = HereDoc.parse(doc);
 				    cfg.options = base.merge({}, option.all, cfg.options); // clone system options
-				    cfg.defaults = base.merge({}, cfg.defaults);
+
+				    var parsedFn = HereDoc.parseFunc(fn);
+				    if (parsedFn.name) { cfg.names.unshift(parsedFn.name); }
+				    cfg.arguments = parsedFn.arguments;
 				  }
 
-				  if (!cfg || !cfg.rules || !cfg.rules.length) {
-				    throw new Error('No rules.');
+				  if (!cfg || !cfg.rules.length) {
+				    //throw new Error('No rules.');
+				    return fn;
 				  }
 
-				  cfg.rules = base.map(cfg.rules, Rule.parse);
+				  cfg.rules = Rule.unique(base.map(cfg.rules, Rule.parse));
 				  //console.log(JSON.stringify(cfg.rules, null, 2));
 
 				  return Self.def(fn, cfg);
@@ -365,73 +369,88 @@
 
 					var HereDoc = {};
 
-					var reDocItem = /^\s*\*\s*@(\w+)\s+(.*?)\s*$/mg;
+					var reDocTag = /^\s*@(\w+)\s/mg,
+					  reDocAsterisk = /^\s*\*[ \t]?/mg;
 
 					/**
 					 * 提取 hereDoc 中的关键字段，去掉行首和行尾的空格
 					 *
 					 * @param {String} hereDocStr
-					 * @param {Array} keys
 					 * @private
 					 */
-					function toObject(hereDocStr, keys) {
-					  var result = {}, map = {},
-					    allKeysMode = !keys.length;
+					function getTags(hereDocStr) {
 
-					  base.eachArr(keys, function(it) { map[it.key] = it; });
+					  hereDocStr = hereDocStr.replace(reDocAsterisk, '');
 
-					  hereDocStr.replace(reDocItem, function(_, key, val) {
-					    val = base.trim(val);
+					  var start = 0, tagKey, desc = '', tags = {};
 
-					    if (map[key] || allKeysMode) {
-					      switch (map[key] && map[key].type) {
-					        case Object:
-					          if (!base.isObject(result[key])) {
-					            result[key] = {};
-					          }
-					          base.merge(result[key], jsonfy(base.wrapInBrackets(val)));
-					          break;
+					  function addTag(key, val) {
+					    if (!(key in tags)) { tags[key] = []; }
+					    tags[key].push(base.trim(val));
+					  }
 
-					        case String:
-					          result[key] = val;
-					          break;
-
-					        default:
-					          if (!(key in result)) {
-					            result[key] = [];
-					          }
-					          result[key].push(val);
-					      }
+					  hereDocStr.replace(reDocTag, function(raw, key, index) {
+					    if (!start) {
+					      desc = base.trim(hereDocStr.substring(start, index));
+					    } else {
+					      addTag(tagKey, hereDocStr.substring(start, index));
 					    }
+
+					    tagKey = key;
+					    start = index + raw.length;
 					  });
-					  return result;
+
+					  if (tagKey) {
+					    addTag(tagKey, hereDocStr.substr(start));
+					  }
+
+					  tags.desc = desc;
+
+					  return tags;
 					}
+
+
+					var _firstLine = function (str) { return str.split(/[\r]?\n/).shift();},
+					  _firstWord = function(str) { /^(\w+)/.test(str); return RegExp.$1; };
 
 					/**
 					 * 解析 HereDoc 成对象
 					 *
 					 * @param {String} hereDocStr
-					 * @param {*} [keys = null]
+					 * @param {Boolean} [forDoc = false]
+					 * @returns {{rules: Array, names: Array, defaults: Object, options: Object}}
 					 *
 					 */
-					HereDoc.parse = function (hereDocStr, keys) {
-					  var _keys = [];
-					  if (base.isString(keys)) {
-					    _keys = [{key: keys, type: Array}];
-					  } else if (base.isObject(keys)) {
-					    base.eachObj(keys, function(val, key) {
-					      _keys.push({key: key, type: val});
-					    });
-					  } else if (base.isArray(keys)) {
-					    base.eachArr(keys, function(val) {
-					      _keys.push({key: val, type: Array});
-					    });
+					HereDoc.parse = function (hereDocStr, forDoc) {
+
+					  var tags = getTags(hereDocStr);
+					  var result = {};
+
+					  base.eachArr(['defaults', 'options'], function(k) {
+					    result[k] = tags[k] ? jsonfy(base.wrapInBrackets(_firstLine(tags[k].pop()))) : {};
+					  });
+
+					  result.rules = base.map((tags.rules || []).concat(tags.rule || []), _firstLine);
+					  result.names = base.map((tags.name ? [tags.name.pop()] : []).concat((tags.alias || [])), _firstWord);
+
+					  var map = {};
+					  result.names = base.filter(result.names, function(name) {
+					    var exists = name in map;
+					    map[name] = true;
+					    return name && !exists;
+					  });
+
+
+					  if (forDoc) {
+					    result.examples = tags.example || [];
+					    result.desc = tags.desc;
 					  }
 
-					  return toObject(hereDocStr, _keys);
+					  return result;
 					};
 
-					var reDoc = /(\/\*\*[\s\S]*?\*\/)/;
+					var reDoc = /(\/\*\*[\s\S]*?\*\/)/,
+					  reFn = /^function\s+(\w*)\s*\((.*)\)/;
 
 					/**
 					 * 通过 fn.toString() 来得到函数内部定义的 hereDoc
@@ -444,6 +463,19 @@
 					  return RegExp.$1 || false;
 					};
 
+					/**
+					 * 得到函数的 arguments 及 name
+					 */
+					HereDoc.parseFunc = function(fn) {
+					  reFn.test(fn.toString());
+					  var args = base.trim(RegExp.$2);
+					  var name = RegExp.$1;
+
+					  args = args ? args.split(/\s*,\s*/) : [];
+					  return {name: name, arguments: args};
+					};
+
+
 					module.exports = HereDoc;
 					if (typeof window !== 'undefined') { window.HereDoc = HereDoc; }
 				},
@@ -452,7 +484,7 @@
 					 * @module option
 					 */
 					var _opts = {
-					  applySelf: false
+					  //applySelf: false  // 此配置已经无用了，现在采取的是自动根据函数中是否有 self 参数来判断是否 applySelf
 					};
 
 					/**
@@ -548,10 +580,11 @@
 					var type = require('./type');
 					var RuleSimple = require('./rule-simple');
 					var jsonfy = require('jsonfy');
+					var scan = require('sscan');
 					var Rule = {};
 
 					var reRule = /\(([^\)]*)\)\s*->\s*(\*|\w+)/;   // ( ... ) -> type
-					var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
+					//var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
 					//var reArg = /(\w+|\*)\s+(\w+)\s*(?:=\s*<(.*?)>\s*)?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
 					var reComma = /\s*,\s*/g;
 
@@ -622,11 +655,77 @@
 					  return jsonfy(val);
 					}
 
+					// args before :  "* start, [int ...length, int step = 1 ]"
+					// args after :   "0, [1, 2]"
+					function _parseRuleArgs(args) {
+					  var tpl = '', params = [], count = 0;
+
+					  scan(args, function(end) {
+
+					    this.white();
+					    if (this.eos()) { end(); }
+
+					    var param = {};
+
+					    tpl += this.till(/[\[\s]/, /[\w\*]/);
+
+					    if (this.isChar('*')) {
+					      param.type = '*';
+					      this.next('*');
+					    } else {
+					      param.type = type.normalize(this.takeWord());
+					    }
+
+					    this.next(/\s/);
+					    this.white();
+
+					    if (this.isChar('.')) {
+					      this.next('.');
+					      this.next('.');
+					      this.next('.');
+					      param.rest = 1;
+					    } else {
+					      param.rest = 0;
+					    }
+					    param.key = this.takeWord();
+
+					    tpl += count++;
+
+					    tpl += this.till(/[\s\[\]]/, ',=', function(rest) {
+					      tpl += rest;
+					      params.push(param); end();
+					    });
+
+					    if (this.isChar('=')) {
+					      this.next('=');
+					      this.white();
+					      if (this.isChar('"\'[{')) {
+					        param.val = this.takeValue();
+					      } else if (this.isChar('<')) {
+					        param.val = this.takePair('<', '>'); // 为了兼容早期的正则表达式版本
+					      } else {
+					        param.val = base.trim(this.take(/[^\[\],]/));
+					      }
+					    }
+
+					    params.push(param);
+
+					    tpl += this.take(/[,\]\[\s]/);
+
+					    if (this.eos()) {
+					      end();
+					    }
+					  });
+
+					  return {tpl: tpl, params: params};
+					}
+
+
 					/**
 					 * 解析 HereDoc 中的一条 @rules 定义的规则
 					 *
 					 * @param {String} rule
-					 * @returns {{returnType: string, params: Array, roads: Array}}
+					 * @returns {{returnType: String, params: [{type: String, key: String, rest: Boolean}], roads: Array}}
 					 */
 					Rule.parse = function(rule) {
 
@@ -634,43 +733,43 @@
 					    throw new SyntaxError('Rule "' + rule + '" defined error.');
 					  }
 
-					  var args = base.trim(RegExp.$1),
-					    params = [], roads = [], index = -1, result, keyMap = {};
+					  var args = base.trim(RegExp.$1), parsedArgs,
+					    roads = [], result, keyMap = {};
 
 					  result = {
 					    returnType: RegExp.$2.toLowerCase(),
-					    params: params,
 					    roads: roads
 					  };
 
-					  // 得到 arg 的默认值
-					  args = args.replace(reArg, function(raw, t, key, val) {
-					    t = t.toLowerCase();
-					    var param, rest = 0;
-					    if (key.indexOf('...') === 0) {
-					      key = key.substr(3);
-					      rest = 1;
-					    }
-					    param = {key: key, type: t, rest: rest};
-					    if (keyMap[key]) {
-					      throw new SyntaxError('Duplicate key ' + key);
-					    }
-					    keyMap[key] = true;
-					    if (val) {
-					      try {
-					        param.val = parseVal(val);
-					      } catch (e) {
-					        throw new SyntaxError('Rule "' + rule + '" value "' + val + '" parsed error.');
-					      }
-					      if (!type.is(param.val, t)) {
-					        throw new SyntaxError(key + '\'s value is not type ' + t);
-					      }
-					    }
-					    params.push(param);
-					    index++;
+					  // args before :  "int start, [int length, int step = 1 ]"
+					  // args after :   "0, [1, 2]"
+					  try {
+					    parsedArgs = _parseRuleArgs(args);
+					  } catch (e) {
+					    throw new Error('Parse rule arguments error: ' + args);
+					  }
 
-					    return ' ' + index + ' ';
+					  args = parsedArgs.tpl;
+					  base.eachArr(parsedArgs.params, function(param) {
+					    if (keyMap[param.key]) { throw new SyntaxError('Duplicate key ' + param.key); }
+					    keyMap[param.key] = true;
+
+					    if (!base.isUndefined(param.val)) {
+					      param.type = param.type.toLowerCase();
+
+					      try {
+					        param.val = parseVal(param.val);
+					      } catch (e) {
+					        throw new SyntaxError('Rule "' + rule + '" value "' + param.val + '" parsed error.');
+					      }
+
+					      if (!type.is(param.val, param.type)) {
+					        throw new SyntaxError(param.key + '\'s value is not type ' + param.type);
+					      }
+					    }
 					  });
+
+					  result.params = parsedArgs.params;
 
 					  // 去掉所有的 ','
 					  args = args.replace(reComma, ' ');
@@ -691,6 +790,7 @@
 					  return result;
 					};
 
+
 					/**
 					 * 将 rule 压缩， compiler 中要用
 					 * @param {Object} parsedRule
@@ -704,6 +804,33 @@
 					    return rtn;
 					  });
 					  return [parsedRule.returnType, params, parsedRule.roads];
+					};
+
+					/**
+					 * 将重复的 rule 中的 road 去掉
+					 * @param {Array} rules
+					 */
+					Rule.unique = function(rules) {
+					  var roads = {};
+					  return base.filter(rules, function(rule) {
+
+					    rule.roads = base.filter(rule.roads, function(road) {
+					      var key = base.map(road, function(index) {
+					        var param = rule.params[index];
+					        return (param.rest ? '...' : '') + param.type;
+					      }).join('|');
+
+					      var exists = key in roads;
+
+					      roads[key] = true;
+
+					      return !exists;
+					    });
+
+
+					    return rule.roads.length > 0;
+
+					  });
 					};
 
 
@@ -743,8 +870,8 @@
 					  return (key in this.values);
 					};
 
-					Self.prototype.$get = function(key) {
-					  return this.values[key];
+					Self.prototype.$get = function(key, dft) {
+					  return this.$has(key) ? this.values[key] : dft;
 					};
 
 					Self.def = function(fn, cfg) {
@@ -763,11 +890,12 @@
 					    // 执行原函数
 					    if (matches) {
 					      var self = new Self(matches, args, rule, cfg.defaults, cfg.options);
-					      if (cfg.options.applySelf) {
-					        return fn.apply(self, args);
-					      } else {
-					        return fn.call(binder, self);
-					      }
+
+					      return fn.apply(
+					        cfg.arguments.indexOf('self') >= 0 ? binder : self,
+					        base.map(cfg.arguments, function(arg) { return arg === 'self' ? self : self.$get(arg); })
+					      );
+
 					    } else {
 					      throw new Error('Not found rule for arguments (' + args.join(', ') + ').');
 					    }
@@ -789,24 +917,28 @@
 
 					var all = type._all = {};
 
-					var basicTypes = '*,int,number,string,object,array,function,arguments,boolean,null,nature,positive,negative'.split(','),
+					var basicTypes = '*,int,number,string,object,array,function,arguments,bool,null,nature,positive,negative'.split(','),
 					  typeAliases = {
 					    integer: 'int',
 					    signed: 'int',
-					    bool: 'boolean',
+					    boolean: 'bool',
 					    unsigned: 'nature'
 					  };
 
-					function is(mix, type) {
-					  if (type in typeAliases) {
-					    type = typeAliases[type];
-					  }
+					function normalize(type) {
+					  type = type.toLowerCase();
+					  return (type in typeAliases) ? typeAliases[type] : type;
+					}
 
+					function is(mix, type) {
+					  type = normalize(type);
 					  switch (type) {
 					    case '*':
 					      return true;
 					    case 'int':
 					      return base.isInt(mix);
+					    case 'bool':
+					      return base.typeOf(mix) === 'boolean';
 					    case 'number':
 					      return base.isNumber(mix);
 					    case 'nature':
@@ -830,6 +962,8 @@
 					}
 
 					base.eachArr(basicTypes.concat(base.objectKeys(typeAliases)), function (key) { all[key] = is; });
+
+					type.normalize = normalize;
 
 					/**
 					 * 判断 mix 是否是 type 类型
@@ -920,9 +1054,16 @@
 				 */
 				function def(fn, cfg) {
 
+				  if (!cfg) {
+				    return fn;
+				  }
+
 				  cfg.rules = base.map(cfg.rules, Rule.decompress);
 				  cfg.options = base.merge({}, option.all, cfg.options);
 				  cfg.defaults = base.merge({}, cfg.defaults);
+
+				  cfg.names = cfg.names || [];
+				  cfg.arguments = cfg.arguments || [];
 
 				  return Self.def(fn, cfg);
 				}
@@ -1170,6 +1311,384 @@
 				  module.exports = jsonfy;
 				if (typeof window !== 'undefined') { window.jsonfy = jsonfy; }
 				}
+			}
+		}
+	},
+	"sscan": {
+		":mainpath:": "src/sscan.js",
+		"src": {
+			"sscan.js": function (exports, module, require) {
+				/*
+				 * sscan
+				 * https://github.com/qiu8310/sscan
+				 *
+				 * Copyright (c) 2015 Zhonglei Qiu
+				 * Licensed under the MIT license.
+				 */
+
+
+				'use strict';
+
+				(function(global, undef) {
+				  /**
+				   * One character
+				   *
+				   * @typedef {String} Char
+				   */
+
+				  /**
+				   * Character matcher
+				   *
+				   * @typedef {String|Function|RegExp} CharMatcher
+				   */
+
+				  var rWhite = /\s/,
+				    rWord = /\w/,
+
+				    quoteModes = {
+				      all: {'"': 1, '\'': 1, match: '"\''},
+				      single: {'\'': 1, match: '\''},
+				      double: {'"': 1, match: '"'},
+				      none: {match: ''}
+				    },
+
+				    /**
+				     * If the character match the charMatcher
+				     *
+				     * @param {Char} ch
+				     * @param {CharMatcher} charMatcher
+				     * @returns {Boolean}
+				     * @private
+				     * @throws {Error} Will throw an error if charMatcher is not a valid CharMatcher.
+				     */
+				    match = function(ch, charMatcher) {
+				      var type = typeof charMatcher;
+				      if (type === 'string') {
+				        return charMatcher.indexOf(ch) >= 0;
+				      } else if (type === 'function') {
+				        return charMatcher(ch);
+				      } else if (charMatcher instanceof RegExp) {
+				        return charMatcher.test(ch);
+				      } else {
+				        throw new Error('Character matcher "' + charMatcher + '" not acceptable.');
+				      }
+				    };
+
+
+				  /**
+				   * Scanner constructor
+				   *
+				   * @param {String} str
+				   * @constructor
+				   */
+				  function Scanner(str) {
+				    /**
+				     * Original str
+				     * @type {String}
+				     */
+				    this.str = str;
+
+				    /**
+				     * Current scan position
+				     * @type {Number}
+				     */
+				    this.pos = 0;
+
+				    /**
+				     * Original str length
+				     * @type {Number}
+				     */
+				    this.len = str.length;
+
+				    ///**
+				    // * Last matched string
+				    // * @type {Object}
+				    // */
+				    //this.lastMatch = {
+				    //  reset: function() {
+				    //    this.str = null;
+				    //    this.captures = [];
+				    //    return this;
+				    //  }
+				    //}.reset();
+				  }
+
+				  Scanner.prototype = {
+				    /**
+				     * If is the begin of string.
+				     * @returns {Boolean}
+				     */
+				    bos: function() {
+				      return this.pos === 0;
+				    },
+
+				    /**
+				     * If is the end of string.
+				     * @param {CharMatcher} [acceptableMatcher]
+				     * @returns {Boolean}
+				     */
+				    eos: function(acceptableMatcher) {
+				      if (acceptableMatcher) {
+				        var i, rest = this.peekRest();
+				        for (i = 0; i < rest.length; i++) {
+				          if (!match(rest.charAt(i), acceptableMatcher)) { return false; }
+				        }
+				        return true;
+				      }
+				      return this.pos === this.len;
+				    },
+
+				    /**
+				     * Reset the position.
+				     */
+				    reset: function() {
+				      this.pos = 0;
+				    },
+
+				    /**
+				     * Throw a SyntaxError.
+				     *
+				     * @param {String} tpl
+				     * @param {String} args...
+				     * @private
+				     */
+				    _syntaxError: function(tpl, args) {
+				      args = [].slice.call(arguments, 1);
+				      tpl = tpl.replace(/%s/g, function() {
+				        return '{{ ' + args.shift() + ' }}';
+				      });
+				      var err = new SyntaxError(tpl);
+				      err.pos = this.pos;
+				      err.str = this.str;
+				      throw err;
+				    },
+
+				    /**
+				     * Get current character.
+				     * @returns {Char}
+				     */
+				    char: function() {
+				      return this.str.charAt(this.pos);
+				    },
+
+				    /**
+				     * If current character match the charMatcher.
+				     * @param {CharMatcher} charMatcher
+				     * @returns {Boolean}
+				     */
+				    isChar: function(charMatcher) {
+				      return match(this.char(), charMatcher);
+				    },
+
+				    /**
+				     * Get next character
+				     * @param {CharMatcher} [charMatcher]
+				     * @returns {Char}
+				     * @throws {Error} Will throws if already in the end.
+				     * @throws {SyntaxError} Will throws if matcher doesn't match current character.
+				     */
+				    next: function(charMatcher) {
+				      if (charMatcher !== undef && !match(this.char(), charMatcher)) {
+				        this._syntaxError('Expect %s, but got %s.', charMatcher, this.char());
+				      }
+				      if (this.eos()) {
+				        throw new Error('EOS');
+				      }
+				      this.pos++;
+				      return this.char();
+				    },
+
+				    /**
+				     * Take next part string that match the charMatcher, can be empty
+				     * @param {CharMatcher} charMatcher
+				     * @returns {String}
+				     */
+				    take: function(charMatcher) {
+				      var ch = this.char(), res = '';
+				      while (match(ch, charMatcher) && !this.eos()) {
+				        res += ch;
+				        ch = this.next();
+				      }
+				      return res;
+				    },
+
+				    /**
+				     * Take the next word.
+				     * @returns {String}
+				     */
+				    takeWord: function() {
+				      var word = this.take(rWord);
+				      if (!word) {
+				        this._syntaxError('Empty string is not a valid word.');
+				      }
+				      return word;
+				    },
+
+				    /**
+				     * Take quotes, object and array.
+				     * @param {String} [quoteMode='all'] - single, double, all
+				     */
+				    takeValue: function(quoteMode) {
+				      var ch = this.char();
+				      if (ch === '[') {
+				        return this.takeArray(quoteMode);
+				      } else if (ch === '{') {
+				        return this.takeObject(quoteMode);
+				      } else if (ch === '"' || ch === '\'') {
+				        return this.takeQuote(quoteMode);
+				      } else {
+				        this._syntaxError('Not a valid value.');
+				      }
+				    },
+
+				    /**
+				     * Take quoted characters.
+				     * @param {String} [quoteMode='all'] - single, double, all
+				     */
+				    takeQuote: function(quoteMode) {
+				      var quotes = quoteModes[quoteMode] || quoteModes.all;
+				      var lastQuote = this.char();
+				      var result = lastQuote, ch = this.next(quotes.match);
+
+				      while (lastQuote) {
+				        if (ch === lastQuote) {
+				          lastQuote = null;
+				        }
+				        result += ch;
+				        ch = this.next();
+				      }
+
+				      return result;
+				    },
+
+				    /**
+				     * Take pair things, line {...}, [...]
+				     *
+				     * @param {Char} left
+				     * @param {Char} right
+				     * @param {String} [quoteMode='all'] - single, double, all, none
+				     */
+				    takePair: function(left, right, quoteMode) {
+				      var ch = this.next(left);
+				      var count = 1, result = left;
+				      var quotes = quoteModes[quoteMode] || quoteModes.all;
+
+				      while (count !== 0) {
+				        count += left === ch ? 1 : (right === ch ? -1 : 0);
+
+				        if (quotes[ch]) {
+				          result += this.takeQuote(quoteMode);
+				          ch = this.char();
+				        } else {
+				          result += ch;
+				          ch = this.next();
+				        }
+				      }
+				      return result;
+				    },
+
+				    /**
+				     * Take javascript object
+				     * @param {String} [quoteMode='all']
+				     */
+				    takeObject: function(quoteMode) {
+				      return this.takePair('{', '}', quoteMode);
+				    },
+
+				    /**
+				     * Take javascript array
+				     * @param {String} [quoteMode='all']
+				     */
+				    takeArray: function(quoteMode) {
+				      return this.takePair('[', ']', quoteMode);
+				    },
+
+				    /**
+				     * Proceed till character match the endMatcher,
+				     * if acceptMatcher supplied, then all mid characters should match the acceptMatcher.
+				     *
+				     * @param {CharMatcher} [acceptMatcher]
+				     * @param {CharMatcher} endMatcher
+				     * @param {Function} [eosFn]
+				     */
+				    till: function(acceptMatcher, endMatcher, eosFn) {
+
+				      var args = [].slice.call(arguments);
+				      if (args.length === 1) {
+				        endMatcher = acceptMatcher;
+				        acceptMatcher = eosFn = null;
+				      } else if (args.length === 2) {
+				        if (typeof args[1] === 'function') {
+				          eosFn = args[1];
+				          endMatcher = args[0];
+				          acceptMatcher = null;
+				        }
+				      }
+
+				      var ch = this.char();
+				      var pass = '';
+				      while (!match(ch, endMatcher) && !this.eos()) {
+				        if (acceptMatcher && !match(ch, acceptMatcher)) {
+				          this._syntaxError('Expect %s, but got %s.', acceptMatcher, ch);
+				        }
+				        pass += ch;
+				        ch = this.next();
+				      }
+				      if (this.eos() && eosFn) { eosFn(pass); }
+				      return pass;
+				    },
+
+
+				    /**
+				     *  Peek next one or specified length
+				     */
+				    peek: function(len) {
+				      return this.str.substr(this.pos + 1, len || 1);
+				    },
+
+				    /**
+				     * Get peek of the rest string.
+				     *
+				     * @returns {String}
+				     */
+				    peekRest: function() {
+				      return this.str.substr(this.pos);
+				    },
+
+				    /**
+				     * Take in all next white spaces.
+				     */
+				    white: function() {
+				      return this.take(rWhite);
+				    }
+				  };
+
+				  /**
+				   * @param {String} str
+				   * @param {Function} [fn]
+				   * @returns {*}
+				   */
+				  function sscan(str, fn) {
+				    var scanner = new Scanner(str);
+				    if (typeof fn === 'function') {
+				      var done = function() { throw {scanDone: true} };
+				      try {
+				        while (true) { fn.call(scanner, done); }
+				      } catch (e) {
+				        if (!e.scanDone) { throw e; }
+				      }
+				    }
+				    return scanner;
+				  }
+
+				  sscan.Scanner = Scanner;
+
+				  // Export to window and node
+				  global.sscan = sscan;
+				  module.exports = sscan;
+				if (typeof window !== 'undefined') { window.sscan = sscan; }
+
+				})(this);
 			}
 		}
 	}

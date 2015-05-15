@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/compile.js</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../prettify.css">
+    <link rel="stylesheet" href="../base.css">
+    <style type='text/css'>
+        div.coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class="header high">
+    <h1>Code coverage report for <span class="entity">src/compile.js</span></h1>
+    <h2>
+        Statements: <span class="metric">98.67% <small>(74 / 75)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">93.75% <small>(30 / 32)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">100% <small>(17 / 17)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">98.53% <small>(67 / 68)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
+    </h2>
+    <div class="path"><a href="../index.html">All files</a> &#187; <a href="index.html">src/</a> &#187; compile.js</div>
+</div>
+<div class="body">
+<pre><table class="coverage">
+<tr><td class="line-count">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-yes">56</span>
+<span class="cline-any cline-yes">28</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-yes">1582</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">16</span>
+<span class="cline-any cline-yes">23</span>
+<span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16</span>
+<span class="cline-any cline-yes">21</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * 编译器
+ *
+ * 将 def 的 heredoc 编译成 def 的第二个参数
+ *
+ */
+&nbsp;
+var base = require('./lib/base'),
+  HereDoc = require('./lib/heredoc'),
+  Rule = require('./lib/rule'),
+  type = require('./lib/type'),
+  esprima = require('esprima'),
+  traverse = require('ast-traverse');
+&nbsp;
+function empty(obj) { return Object.keys(obj).length === 0; }
+&nbsp;
+&nbsp;
+function _getIndexedCfgArray (content, opts, forDoc) {
+&nbsp;
+  opts = base.merge({defName: 'def'}, opts);
+&nbsp;
+  var ast = esprima.parse(content, {range: true, comment: true, loc: true});
+&nbsp;
+  //require('fs').writeFileSync('./ast.json', JSON.stringify(ast, null, 2));
+  //process.exit();
+&nbsp;
+  var docs = [];
+  var findDocCfg = function(range) {
+    for (var r, i = 0; i &lt; docs.length; i++) {
+      r = docs[i].range;
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (range[0] &lt;= r[0] &amp;&amp; range[1] &gt;= r[1]) {
+        return docs.splice(i, 1)[0].cfg;
+      }
+    }
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  };
+&nbsp;
+&nbsp;
+  base.eachArr(ast.comments, function(comment) {
+    if (comment.type === 'Block') {
+      var cfg = HereDoc.parse(comment.value, forDoc);
+&nbsp;
+      if (cfg &amp;&amp; cfg.rules.length) {
+        cfg.rules = Rule.unique(base.map(cfg.rules, Rule.parse));
+&nbsp;
+        docs.push({range: comment.range, cfg: cfg});
+      }
+    }
+  });
+  delete ast.comments;
+&nbsp;
+  var indexes = [];
+  traverse(ast, {pre: function(node) {
+    if (
+      node.type === 'CallExpression' &amp;&amp;
+      node.callee.name === opts.defName &amp;&amp;
+      node.arguments.length === 1 &amp;&amp;
+      node.arguments[0].type === 'FunctionExpression'
+    ) {
+      delete node.range;
+      var cfg = findDocCfg(node.arguments[0].range);
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (cfg) {
+        if (node.arguments[0].id) { cfg.names.push(node.arguments[0].id.name); }
+&nbsp;
+        cfg.arguments = base.map(node.arguments[0].params, function(it) { return it.name; });
+&nbsp;
+        indexes.push({range: node.arguments[0].range, loc: node.arguments[0].loc, cfg: cfg});
+      }
+    }
+  }});
+&nbsp;
+  return indexes;
+}
+&nbsp;
+&nbsp;
+/**
+ * 编译带 HereDoc 的 def 函数
+ * @param {String} content
+ * @param {Object} opts
+ * @param {String} opts.defName
+ * @returns {String}
+ */
+function compile (content, opts) {
+  var indexes = _getIndexedCfgArray(content, opts);
+&nbsp;
+  base.eachArr(indexes, function(item) {
+    var cfg = item.cfg;
+    cfg.rules = base.map(cfg.rules, Rule.compress);
+&nbsp;
+    base.eachArr(['options', 'defaults'], function(k) {
+      if (empty(cfg[k])) { delete cfg[k]; }
+    });
+&nbsp;
+    // 如果没有 names 和 arguments，则把它们删除
+    if (!cfg.names.length) { delete cfg.names; }
+    if (!cfg.arguments.length) { delete cfg.arguments; }
+  });
+&nbsp;
+  var out = [], idx = 0;
+  base.eachArr(indexes.sort(function(a, b) { return a.range[1] - b.range[1]; }), function(it) {
+    out.push(content.substring(idx, it.range[1]), ', ' + JSON.stringify(it.cfg));
+    idx = it.range[1];
+  });
+  out.push(content.substr(idx));
+  return out.join('');
+}
+&nbsp;
+/**
+ * 生成文档
+ * @param {String} content
+ * @param {Object} opts
+ * @param {String} opts.defName
+ * @returns {{range: Array, loc: Object, rules: Array}}
+ *
+ * @example
+ *
+ *  [
+ *    {
+ *      "range":[60,334],
+ *      "loc":{
+ *        "start":{"line":3,"column":18},
+ *        "end":{"line":17,"column":3}
+ *      },
+ *      "rules":[
+ *        {"returnType":"int","road":[]},
+ *        {"returnType":"int","road":[{"type":"int","key":"a","val":0}]}
+ *      ]
+ *    }
+ *  ]
+ */
+compile.doc = function(content, opts) {
+  var indexes = _getIndexedCfgArray(content, opts, true);
+&nbsp;
+  base.eachArr(indexes, function (item) {
+&nbsp;
+    var cfg = item.cfg;
+    var rules = [];
+    delete item.cfg;
+&nbsp;
+    base.eachArr(cfg.rules, function(rule) {
+      var params = base.map(rule.params, function(p) {
+        if (!('val' in p) &amp;&amp; (p.key in cfg.defaults)) {
+          p.val = cfg.defaults[p.key];
+        }
+&nbsp;
+        p.type = type.normalize(p.type);
+&nbsp;
+        if (p.rest) {
+          p.key = '...' + p.key;
+        }
+&nbsp;
+        delete p.rest;
+&nbsp;
+        return p;
+      });
+&nbsp;
+      base.eachArr(rule.roads, function(road) {
+        rules.push({
+          returnType: rule.returnType,
+          road: base.map(road, function(index) { return params[index]; })
+        });
+      });
+    });
+&nbsp;
+    item.names = cfg.names;
+    item.desc = cfg.desc;
+    item.rules = rules;
+    item.examples = cfg.examples;
+  });
+&nbsp;
+  return indexes;
+};
+&nbsp;
+&nbsp;
+module.exports = compile;
+&nbsp;</pre></td></tr>
+</table></pre>
+
+</div>
+<div class="footer">
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri May 15 2015 08:38:10 GMT+0800 (CST)</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <script src="sscan.js"></script>
+</head>
+<body>
+<script>
+  var scanner;
+
+  scanner = sscan('a{www}bc');
+
+  console.log(scanner.bos());
+  console.log(scanner.next() === '{');
+  console.log(scanner.takeObject() === '{www}');
+  console.log(scanner.takeWord() === 'bc');
+  console.log(scanner.eos());
+</script>
+</body>
+</html>

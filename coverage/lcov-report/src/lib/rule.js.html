@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/lib/rule.js</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../../prettify.css">
+    <link rel="stylesheet" href="../../base.css">
+    <style type='text/css'>
+        div.coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class="header high">
+    <h1>Code coverage report for <span class="entity">src/lib/rule.js</span></h1>
+    <h2>
+        Statements: <span class="metric">99.25% <small>(132 / 133)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">100% <small>(52 / 52)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">100% <small>(16 / 16)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">99.19% <small>(122 / 123)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
+    </h2>
+    <div class="path"><a href="../../index.html">All files</a> &#187; <a href="index.html">src/lib/</a> &#187; rule.js</div>
+</div>
+<div class="body">
+<pre><table class="coverage">
+<tr><td class="line-count">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">162</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">126</span>
+<span class="cline-any cline-yes">126</span>
+<span class="cline-any cline-yes">83</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">127</span>
+<span class="cline-any cline-yes">127</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-yes">115</span>
+<span class="cline-any cline-yes">42</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-yes">264</span>
+<span class="cline-any cline-yes">264</span>
+<span class="cline-any cline-yes">264</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">153</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">7</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">152</span>
+<span class="cline-any cline-yes">152</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">134</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">133</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">142</span>
+<span class="cline-any cline-yes">73</span>
+<span class="cline-any cline-yes">73</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-yes">4</span>
+<span class="cline-any cline-yes">22</span>
+<span class="cline-any cline-yes">7</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">68</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">68</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">68</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">95</span>
+<span class="cline-any cline-yes">2</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-yes">93</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92</span>
+<span class="cline-any cline-yes">92</span>
+<span class="cline-any cline-yes">141</span>
+<span class="cline-any cline-yes">140</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">140</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">90</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">89</span>
+<span class="cline-any cline-yes">119</span>
+<span class="cline-any cline-yes">119</span>
+<span class="cline-any cline-yes">24</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">95</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">89</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">17</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-yes">25</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">47</span>
+<span class="cline-any cline-yes">47</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">74</span>
+<span class="cline-any cline-yes">98</span>
+<span class="cline-any cline-yes">125</span>
+<span class="cline-any cline-yes">125</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">98</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">98</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">98</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">74</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * @module rule
+ */
+&nbsp;
+var base = require('./base');
+var type = require('./type');
+var RuleSimple = require('./rule-simple');
+var jsonfy = require('jsonfy');
+var scan = require('sscan');
+var Rule = {};
+&nbsp;
+var reRule = /\(([^\)]*)\)\s*-&gt;\s*(\*|\w+)/;   // ( ... ) -&gt; type
+//var reArg = /(\w+|\*)\s+((?:\.\.\.)?\w+)\s*(?:=(.*?))?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+(?:\.\.\.)?\w+|$))/g;
+//var reArg = /(\w+|\*)\s+(\w+)\s*(?:=\s*&lt;(.*?)&gt;\s*)?\s*(?=[,\[\]\s]*(?:[\*\w]+\s+\w+|$))/g;
+var reComma = /\s*,\s*/g;
+&nbsp;
+base.merge(Rule, RuleSimple);
+&nbsp;
+/**
+ *
+ * - 遇到 '['，到对应的 ']' 中的内容有两种选择，要或者不要
+ * - 遇到非 '['，添加到 prefix
+ *
+ * @param {String} prefix
+ * @param {String} rest
+ * @param {Function} cb
+ * @private
+ */
+function consume(prefix, rest, cb) {
+  if (rest === '') { return cb(prefix); }
+&nbsp;
+  var index = rest.indexOf('[');
+  if (index &lt; 0) {
+    return cb(prefix + rest);
+&nbsp;
+  } else if (index === 0) {
+    var count = 0, c, i;
+    for (i = 1; i &lt; rest.length; i++) {
+      c = rest.charAt(i);
+      if (c === '[') {
+        count++;
+      } else if (c === ']') {
+        if (count === 0) {
+          consume(prefix, rest.substr(i + 1), cb);
+          consume(prefix, rest.substring(index + 1, i) + rest.substr(i + 1), cb);
+        } else {
+          count--;
+        }
+      }
+    }
+&nbsp;
+  } else {
+    consume(prefix + rest.substring(0, index), rest.substr(index), cb);
+  }
+}
+&nbsp;
+&nbsp;
+/**
+ * 字符串中是否有成对的 [, ]
+ * @param {String} str
+ * @returns {Boolean}
+ * @private
+ */
+function isBracketsPaired(str) {
+  var count = 0, i, c;
+  for (i = 0; i &lt; str.length; i++) {
+    c = str.charAt(i);
+    if (c === '[') { count++; }
+    if (c === ']') { count--; }
+  }
+  return count === 0;
+}
+&nbsp;
+function toInt(str) { return parseInt(str, 10); }
+&nbsp;
+function parseVal(val) {
+  val = val.trim();
+  if (val.charAt(0) === '&lt;' &amp;&amp; val.charAt(val.length - 1) === '&gt;') {
+    val = val.substr(1, val.length - 2);
+  }
+  return jsonfy(val);
+}
+&nbsp;
+// args before :  "* start, [int ...length, int step = 1 ]"
+// args after :   "0, [1, 2]"
+function _parseRuleArgs(args) {
+  var tpl = '', params = [], count = 0;
+&nbsp;
+  scan(args, function(end) {
+&nbsp;
+    this.white();
+    if (this.eos()) { end(); }
+&nbsp;
+    var param = {};
+&nbsp;
+    tpl += this.till(/[\[\s]/, /[\w\*]/);
+&nbsp;
+    if (this.isChar('*')) {
+      param.type = '*';
+      this.next('*');
+    } else {
+      param.type = type.normalize(this.takeWord());
+    }
+&nbsp;
+    this.next(/\s/);
+    this.white();
+&nbsp;
+    if (this.isChar('.')) {
+      this.next('.');
+      this.next('.');
+      this.next('.');
+      param.rest = 1;
+    } else {
+      param.rest = 0;
+    }
+    param.key = this.takeWord();
+&nbsp;
+    tpl += count++;
+&nbsp;
+    tpl += this.till(/[\s\[\]]/, ',=', function(rest) {
+      tpl += rest;
+      params.push(param); end();
+    });
+&nbsp;
+    if (this.isChar('=')) {
+      this.next('=');
+      this.white();
+      if (this.isChar('"\'[{')) {
+        param.val = this.takeValue();
+      } else if (this.isChar('&lt;')) {
+        param.val = this.takePair('&lt;', '&gt;'); // 为了兼容早期的正则表达式版本
+      } else {
+        param.val = base.trim(this.take(/[^\[\],]/));
+      }
+    }
+&nbsp;
+    params.push(param);
+&nbsp;
+    tpl += this.take(/[,\]\[\s]/);
+&nbsp;
+    if (this.eos()) {
+      end();
+    }
+  });
+&nbsp;
+  return {tpl: tpl, params: params};
+}
+&nbsp;
+&nbsp;
+/**
+ * 解析 HereDoc 中的一条 @rules 定义的规则
+ *
+ * @param {String} rule
+ * @returns {{returnType: String, params: [{type: String, key: String, rest: Boolean}], roads: Array}}
+ */
+Rule.parse = function(rule) {
+&nbsp;
+  if (!reRule.test(rule)) {
+    throw new SyntaxError('Rule "' + rule + '" defined error.');
+  }
+&nbsp;
+  var args = base.trim(RegExp.$1), parsedArgs,
+    roads = [], result, keyMap = {};
+&nbsp;
+  result = {
+    returnType: RegExp.$2.toLowerCase(),
+    roads: roads
+  };
+&nbsp;
+  // args before :  "int start, [int length, int step = 1 ]"
+  // args after :   "0, [1, 2]"
+  try {
+    parsedArgs = _parseRuleArgs(args);
+  } catch (e) {
+    throw new Error('Parse rule arguments error: ' + args);
+  }
+&nbsp;
+  args = parsedArgs.tpl;
+  base.eachArr(parsedArgs.params, function(param) {
+    if (keyMap[param.key]) { throw new SyntaxError('Duplicate key ' + param.key); }
+    keyMap[param.key] = true;
+&nbsp;
+    if (!base.isUndefined(param.val)) {
+      param.type = param.type.toLowerCase();
+&nbsp;
+      try {
+        param.val = parseVal(param.val);
+      } catch (e) {
+<span class="cstat-no" title="statement not covered" >        throw new SyntaxError('Rule "' + rule + '" value "' + param.val + '" parsed error.');</span>
+      }
+&nbsp;
+      if (!type.is(param.val, param.type)) {
+        throw new SyntaxError(param.key + '\'s value is not type ' + param.type);
+      }
+    }
+  });
+&nbsp;
+  result.params = parsedArgs.params;
+&nbsp;
+  // 去掉所有的 ','
+  args = args.replace(reComma, ' ');
+&nbsp;
+  // 确保 [ 和 ] 的个数是一样的
+  if (!isBracketsPaired(args)) { throw new SyntaxError('Rule "' + rule + '" brackets not paired'); }
+&nbsp;
+  // 得到所有可能的组合
+  consume('', args, function(r) {
+    r = base.trim(r);
+    if (!r) {
+      roads.push([]);
+    } else {
+      roads.push(base.map(r.split(/\s+/), toInt));
+    }
+  });
+&nbsp;
+  return result;
+};
+&nbsp;
+&nbsp;
+/**
+ * 将 rule 压缩， compiler 中要用
+ * @param {Object} parsedRule
+ * @returns {Array}
+ */
+Rule.compress = function(parsedRule) {
+  var params = base.map(parsedRule.params, function(param) {
+    var rtn = [param.key, param.type];
+    if (param.rest) { rtn.unshift(param.rest); }
+    if ('val' in param) { rtn.push(param.val); }
+    return rtn;
+  });
+  return [parsedRule.returnType, params, parsedRule.roads];
+};
+&nbsp;
+/**
+ * 将重复的 rule 中的 road 去掉
+ * @param {Array} rules
+ */
+Rule.unique = function(rules) {
+  var roads = {};
+  return base.filter(rules, function(rule) {
+&nbsp;
+    rule.roads = base.filter(rule.roads, function(road) {
+      var key = base.map(road, function(index) {
+        var param = rule.params[index];
+        return (param.rest ? '...' : '') + param.type;
+      }).join('|');
+&nbsp;
+      var exists = key in roads;
+&nbsp;
+      roads[key] = true;
+&nbsp;
+      return !exists;
+    });
+&nbsp;
+&nbsp;
+    return rule.roads.length &gt; 0;
+&nbsp;
+  });
+};
+&nbsp;
+&nbsp;
+module.exports = Rule;
+&nbsp;</pre></td></tr>
+</table></pre>
+
+</div>
+<div class="footer">
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri May 15 2015 08:38:10 GMT+0800 (CST)</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

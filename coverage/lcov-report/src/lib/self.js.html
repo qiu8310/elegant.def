@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/lib/self.js</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../../prettify.css">
+    <link rel="stylesheet" href="../../base.css">
+    <style type='text/css'>
+        div.coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class="header high">
+    <h1>Code coverage report for <span class="entity">src/lib/self.js</span></h1>
+    <h2>
+        Statements: <span class="metric">100% <small>(33 / 33)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">100% <small>(12 / 12)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Functions: <span class="metric">100% <small>(9 / 9)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">100% <small>(32 / 32)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
+    </h2>
+    <div class="path"><a href="../../index.html">All files</a> &#187; <a href="index.html">src/lib/</a> &#187; self.js</div>
+</div>
+<div class="body">
+<pre><table class="coverage">
+<tr><td class="line-count">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">518</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">524</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">33</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">32</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">51</span>
+<span class="cline-any cline-yes">293</span>
+<span class="cline-any cline-yes">293</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">293</span>
+<span class="cline-any cline-yes">374</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">293</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">288</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">111</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var base = require('./base');
+var Rule = require('./rule-simple');
+&nbsp;
+/**
+ * @class Self
+ * @param {Object} values
+ * @param {Array} args
+ * @param {Object} $rule
+ * @param {Object} $defaults
+ * @param {Object} $options
+ */
+function Self(values, args, $rule, $defaults, $options) {
+  var dft = base.merge({}, $defaults);
+  base.eachArr($rule.params, function(param) {
+    if ('val' in param) { dft[param.key] = param.val; }
+  });
+  this.values = base.merge(dft, values);
+  this.arguments = args;
+  this.$rule = $rule;
+  this.$defaults = $defaults;
+  this.$options = $options;
+&nbsp;
+  var self = this;
+  base.eachObj(this.values, function(val, key) {
+    self[key] = val;
+  });
+}
+&nbsp;
+Self.prototype.$has = function(key) {
+  return (key in this.values);
+};
+&nbsp;
+Self.prototype.$get = function(key, dft) {
+  return this.$has(key) ? this.values[key] : dft;
+};
+&nbsp;
+Self.def = function(fn, cfg) {
+  return function() {
+    var binder = this;
+    var args = base.arrify(arguments), matches = false, rule;
+&nbsp;
+    // 遍历规则，看是否有匹配的，有的话立即跳出
+    base.eachArr(cfg.rules, function(r) {
+      if ((matches = Rule.match(r, args))) {
+        rule = r;
+        return false;
+      }
+    });
+&nbsp;
+    // 执行原函数
+    if (matches) {
+      var self = new Self(matches, args, rule, cfg.defaults, cfg.options);
+&nbsp;
+      return fn.apply(
+        cfg.arguments.indexOf('self') &gt;= 0 ? binder : self,
+        base.map(cfg.arguments, function(arg) { return arg === 'self' ? self : self.$get(arg); })
+      );
+&nbsp;
+    } else {
+      throw new Error('Not found rule for arguments (' + args.join(', ') + ').');
+    }
+  };
+};
+&nbsp;
+&nbsp;
+module.exports = Self;
+&nbsp;</pre></td></tr>
+</table></pre>
+
+</div>
+<div class="footer">
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri May 15 2015 08:38:10 GMT+0800 (CST)</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>
