@@ -12,35 +12,41 @@
 * Using `this`
 
   ```js
-  def(function index() {
+  var index = def(function index() {
     /**
      * @rule (Array arr [, Int num]) -> *
      */
      return this.arr[this.num];
   });
+  
+  index([1,2,3], 1) === 2;
   ```
 
 * Using `self`
 
   ```js
-  def(function index(self) {
+  var index = def(function index(self) {
     /**
      * @rule (Array arr [, Int num]) -> *
      */
      return self.arr[self.num];
   });
+  
+  index([1,2,3], 1) === 2;
   ```
 
 * Using arguments inject
 
   ```js
-  def(function index(arr, other) {
+  var index = def(function index(arr, other) {
     /**
      * @rule (Array arr [, Int num]) -> *
      */
      // Parameter `other` will always be `undefined`
      return arr[this.num];
   });
+  
+  index([1,2,3], 1) === 2;
   ```
   
 ## Install
