@@ -2,7 +2,7 @@
 
 ### [(anonymous)](multiple-def.js#L3-8)
 
-__Rules: __
+__Rules:__ 
 
   - `(int a) -> int`
 
@@ -11,7 +11,7 @@ __Rules: __
 
 ### [(anonymous)](multiple-def.js#L10-16)
 
-__Rules: __
+__Rules:__ 
 
   - `(int b) -> string`
 

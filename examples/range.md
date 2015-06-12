@@ -2,7 +2,7 @@
 
 ### [(anonymous)](range.js#L6-20)
 
-__Rules: __
+__Rules:__ 
 
   - `() -> array`
   - `(int start = 0) -> array`

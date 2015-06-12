@@ -2,7 +2,7 @@
 
 ### [(anonymous)](unique.js#L3-11)
 
-__Rules: __
+__Rules:__ 
 
   - `() -> int`
   - `(int a = 0) -> int`

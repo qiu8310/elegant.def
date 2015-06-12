@@ -2,7 +2,7 @@
 
 ### [(anonymous)](class-member-def.js#L7-12)
 
-__Rules: __
+__Rules:__ 
 
   - `(string words) -> string`
 

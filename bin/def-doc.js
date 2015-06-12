@@ -40,23 +40,23 @@ if (!program.args.length) {
     docs.forEach(function(docObj) {
 
       var source = relativeFile + '#L' + docObj.loc.start.line + '-' + docObj.loc.end.line;
-      result.push('### [' + (docObj.names && docObj.names.shift() || '(anonymous)') + '](' + source + ')');
+      result.push('### [' + (docObj.names && docObj.names.length && docObj.names.join(' & ') || '(anonymous)') + '](' + source + ')');
 
       if (docObj.desc) {
         result.push(docObj.desc);
       }
 
-      if (docObj.names && docObj.names.length) {
-        result.push('__Alias: __`' + docObj.names.join('`, `') + '`');
-      }
+      //if (docObj.names && docObj.names.length) {
+      //  result.push('__Alias:__ `' + docObj.names.join('`, `') + '`');
+      //}
 
-      result.push('__Rules: __');
+      result.push('__Rules:__ ');
       result.push(docObj.rules.map(function(rule) {
         return '  - `' + ruleToString(rule) + '`';
       }).join(os.EOL));
 
       if (docObj.examples.length) {
-        result.push('__Examples: __');
+        result.push('__Examples:__ ');
       }
       docObj.examples.forEach(function(ex) {
         result.push('```js');

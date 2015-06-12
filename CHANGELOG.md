@@ -1,4 +1,11 @@
 
+3.0.0-alpha.2 / 2015-06-12
+==========================
+
+  * 指定 doc 中的 example 的脚本名称为 javascript
+  * update readme
+  * Fix node v0.10 not support child_process.execSync
+
 3.0.0-alpha.1 / 2015-05-15
 ==========================
 

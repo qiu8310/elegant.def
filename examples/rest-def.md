@@ -2,7 +2,7 @@
 
 ### [(anonymous)](rest-def.js#L3-11)
 
-__Rules: __
+__Rules:__ 
 
   - `(int ...all) -> int`
 
@@ -11,7 +11,7 @@ __Rules: __
 
 ### [(anonymous)](rest-def.js#L19-25)
 
-__Rules: __
+__Rules:__ 
 
   - `(array to = [], * ...others) -> array`
 
@@ -20,7 +20,7 @@ __Rules: __
 
 ### [(anonymous)](rest-def.js#L32-37)
 
-__Rules: __
+__Rules:__ 
 
   - `(int a, int ...b, string c) -> string`
 

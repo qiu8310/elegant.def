@@ -121,6 +121,7 @@ when your code is compiled, you can use a smaller elegant.def script.
 ----------- | ---------------
 `@name`     | `String`, Function name
 `@alias`    | `String`, Function name alias
+`@example`  | `String`, Function example, used in generating doc
 `@defaults` | `Object`, Function's arguments default values
 `@rule`     | The main config item (Continue to see more detail)
 
@@ -240,6 +241,7 @@ __Case Insensitive__
 * rule 可以指定名称，然后在函数执行是可以知道当前是匹配了哪条 rule
 * 整合我的 spa-bootstrap
 * 支持新类型 enum: (string<enum> flag = ok|cancel, string foo)
+* 支持多 type: (string|int some, bool other) -> *
 * 根据 rule 自动化测试
 * 自动测试
 * silent def

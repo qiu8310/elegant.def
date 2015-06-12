@@ -2,7 +2,7 @@
 
 ### [(anonymous)](random.js#L6-13)
 
-__Rules: __
+__Rules:__ 
 
   - `() -> int`
   - `(int min = 0) -> int`

@@ -2,7 +2,7 @@
 
 ### [someName](embed-def.js#L3-17)
 
-__Rules: __
+__Rules:__ 
 
   - `(int a) -> int`
 
@@ -11,7 +11,7 @@ __Rules: __
 
 ### [(anonymous)](embed-def.js#L8-13)
 
-__Rules: __
+__Rules:__ 
 
   - `(int a) -> int`
 

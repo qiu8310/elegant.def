@@ -17,7 +17,7 @@
   "strict": false,
   "trailing": true,
   "smarttabs": true,
-  "maxlen": 120,
+  "maxlen": 140,
   "globals": {
     "describe"   : false,
     "context"    : false,
